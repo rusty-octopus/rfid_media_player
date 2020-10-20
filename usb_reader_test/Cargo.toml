@@ -1,5 +1,5 @@
 [package]
-name = "usn_reader_test"
+name = "usb_reader_test"
 version = "0.1.0"
 authors = ["rusty-octopus <octopus@posteo.net>"]
 edition = "2018"
