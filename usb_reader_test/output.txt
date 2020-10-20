@@ -1,0 +1,92 @@
+Read result: Ok(3)
+Buffer: [1, 0, 39]
+Value: '
+Read result: Ok(3)
+Buffer: [1, 0, 0]
+Value: 
+Read result: Ok(3)
+Buffer: [1, 0, 39]
+Value: '
+Read result: Ok(3)
+Buffer: [1, 0, 0]
+Value: 
+Read result: Ok(3)
+Buffer: [1, 0, 39]
+Value: '
+Read result: Ok(3)
+Buffer: [1, 0, 35]
+Value: #
+Read result: Ok(3)
+Buffer: [1, 0, 0]
+Value: 
+Read result: Ok(3)
+Buffer: [1, 0, 35]
+Value: #
+Read result: Ok(3)
+Buffer: [1, 0, 33]
+Value: !
+Read result: Ok(3)
+Buffer: [1, 0, 30]
+Value: 
+Read result: Ok(3)
+Buffer: [1, 0, 35]
+Value: #
+Read result: Ok(3)
+Buffer: [1, 0, 33]
+Value: !
+Read result: Ok(3)
+Buffer: [1, 0, 31]
+Value: 
+Read result: Ok(3)
+Buffer: [1, 0, 40]
+Value: (
+Read result: Ok(3)
+Buffer: [1, 0, 0]
+'0006641642'\n
+
+Read result: Ok(3)
+Buffer: [1, 0, 39]
+Value: '
+Read result: Ok(3)
+Buffer: [1, 0, 0]
+Value: 
+Read result: Ok(3)
+Buffer: [1, 0, 39]
+Value: '
+Read result: Ok(3)
+Buffer: [1, 0, 0]
+Value: 
+Read result: Ok(3)
+Buffer: [1, 0, 39]
+Value: '
+Read result: Ok(3)
+Buffer: [1, 0, 35]
+Value: #
+Read result: Ok(3)
+Buffer: [1, 0, 0]
+Value: 
+Read result: Ok(3)
+Buffer: [1, 0, 35]
+Value: #
+Read result: Ok(3)
+Buffer: [1, 0, 32]
+Value:  
+Read result: Ok(3)
+Buffer: [1, 0, 31]
+Value: 
+Read result: Ok(3)
+Buffer: [1, 0, 39]
+Value: '
+Read result: Ok(3)
+Buffer: [1, 0, 35]
+Value: #
+Read result: Ok(3)
+Buffer: [1, 0, 39]
+Value: '
+Read result: Ok(3)
+Buffer: [1, 0, 40]
+Value: (
+Read result: Ok(3)
+Buffer: [1, 0, 0]
+Value:
+'0006632060'\n
