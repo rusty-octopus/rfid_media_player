@@ -1,5 +1,9 @@
 # Readme
 
+## Open questions
+
+* Does a long timeout cost CPU cycles?
+
 ## Device
 
 * Bus 002 Device 003 ID 16c0:27db
