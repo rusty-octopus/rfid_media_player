@@ -94,31 +94,37 @@ class RfidReader {
   + drop()
 }
 
-interface KeyMap<T> {
-  + map([Key]):T
+interface KeyMap {
+  + map(u8):Result<char>
 }
-class NeuftecKeyMap
-interface KeyMapper<T> {
-  + map(Key):T
-}
+class NeuftechKeyMap
 
-interface Key
-interface UsbDevice {
+
+interface UsbReadDevice {
   + open(vendor_id, product_id):Result<UsbDevice>
-  + read(): Future<[Key]>
+  + read(): Future<[u8]>
   + drop()
 }
+
+class NeuftechUsbReadDevice
+
+note left of NeuftechUsbReadDevice
+  handles "protocol"
+  returns only array with
+  u8 values that represent keys
+end note
+
 class TimeoutHandler
 
 class libusb #LightGrey
 
-RfidReader -down-> UsbDevice
-RfidReader -down-> KeyMapper
+NeuftechUsbReadDevice -up-|> UsbReadDevice
 
-NeuftecKeyMap .up-|> KeyMap: T=u8
+RfidReader -down-> UsbReadDevice
+RfidReader -down-> KeyMap
 
-KeyMapper -down-> KeyMap
+NeuftechKeyMap .up-|> KeyMap
 
-UsbDevice --> TimeoutHandler
-UsbDevice -down-> libusb
+NeuftechUsbReadDevice --> TimeoutHandler
+NeuftechUsbReadDevice -down-> libusb
 ```
