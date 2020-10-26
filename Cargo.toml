@@ -1,5 +1,6 @@
 [workspace]
 
 members = [
+    "rfid_reader",
     "usb_reader_test"
 ]

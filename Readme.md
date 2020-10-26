@@ -1,5 +1,9 @@
 # Readme
 
+## Links
+
+* [Compile Rust for Raspberry Pi ARM](https://medium.com/swlh/compiling-rust-for-raspberry-pi-arm-922b55dbb050)
+
 ## Useful crates
 
 * [rodio](https://docs.rs/rodio/0.12.0/rodio/)
