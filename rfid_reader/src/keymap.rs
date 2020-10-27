@@ -6,5 +6,5 @@ pub(crate) enum Key {
   Enter,
 }
 pub(crate) trait KeyMap {
-  fn map(key:u8) -> Result<Key,KeyMapError>;
+  fn map(&self, key:u8) -> Result<Key,KeyMapError>;
 }

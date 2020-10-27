@@ -4,7 +4,7 @@ use crate::keymaperror::KeyMapError;
 struct NeuftechKeyMap{}
 
 impl KeyMap for NeuftechKeyMap {
-  fn map(key: u8) -> Result<Key,KeyMapError> {
+  fn map(&self, key: u8) -> Result<Key,KeyMapError> {
     const OFFSET_KEY_TO_UTF8:u8 = 0x13;
     match key {
       // Key board codes are 30-30 for keys 1-9 (utf8 hex values 0x31-0x39)
