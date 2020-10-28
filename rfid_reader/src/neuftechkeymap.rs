@@ -1,7 +1,7 @@
 use crate::keymap::{KeyMap,Key};
 use crate::keymaperror::KeyMapError;
 
-struct NeuftechKeyMap{}
+struct NeuftechKeyMap;
 
 impl KeyMap for NeuftechKeyMap {
   fn map(&self, key: u8) -> Result<Key,KeyMapError> {
@@ -26,19 +26,22 @@ mod tests {
 
   #[test]
   fn test_digits() {
+    let keymap = NeuftechKeyMap;
     let digits: Vec<Result<Key, KeyMapError>> = ('1'..='9').map(|c|Ok(Key::Digit(c))).collect();
-    let mapped_keys: Vec<Result<Key, KeyMapError>>= (30..39).map(|i|NeuftechKeyMap::map(usize::try_into(i).unwrap())).collect();
+    let mapped_keys: Vec<Result<Key, KeyMapError>>= (30..39).map(|i|keymap.map(usize::try_into(i).unwrap())).collect();
     assert_eq!(digits, mapped_keys);
-    assert_eq!(Ok(Key::Digit('0')), NeuftechKeyMap::map(39));
+    assert_eq!(Ok(Key::Digit('0')), keymap.map(39));
   }
 
   #[test]
   fn test_enter() {
-    assert_eq!(Ok(Key::Enter), NeuftechKeyMap::map(40));
+    let keymap = NeuftechKeyMap;
+    assert_eq!(Ok(Key::Enter), keymap.map(40));
   }
 
   #[test]
   fn test_error(){
-    assert_eq!(Err(KeyMapError::from_key_not_existing(17)), NeuftechKeyMap::map(17));
+    let keymap = NeuftechKeyMap;
+    assert_eq!(Err(KeyMapError::from_key_not_existing(17)), keymap.map(17));
   }
 }
