@@ -1,6 +1,5 @@
 use crate::keymap::{Key, KeyMap};
-use crate::neuftechkeymap::NeuftechKeyMap;
-use crate::neuftechusbreader::NeuftechUsbReader;
+use crate::neuftech::{NeuftechKeyMap, NeuftechUsbReader};
 use crate::usbreader::UsbReader;
 use std::time::Duration;
 

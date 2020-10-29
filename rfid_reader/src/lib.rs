@@ -1,6 +1,5 @@
 mod keymap;
 mod keymaperror;
-mod neuftechkeymap;
-mod neuftechusbreader;
+mod neuftech;
 mod rfidreader;
 mod usbreader;
