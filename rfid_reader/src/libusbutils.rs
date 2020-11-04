@@ -1,5 +1,5 @@
 use crate::error::Error;
-use libusb::{Context, Device, DeviceDescriptor, Direction, TransferType};
+use libusb::{Context, Device, DeviceDescriptor, DeviceHandle, Direction, TransferType};
 
 #[derive(Debug, PartialEq)]
 pub(crate) struct EndPoint {
@@ -7,6 +7,13 @@ pub(crate) struct EndPoint {
     interface: u8,
     setting: u8,
     address: u8,
+}
+
+fn configure_device_handle(
+    device_handle: &mut DeviceHandle,
+    end_point: &EndPoint,
+) -> Result<(), Error> {
+    todo!()
 }
 
 fn get_device(
