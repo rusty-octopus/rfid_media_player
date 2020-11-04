@@ -1,6 +1,7 @@
 mod error;
 mod keymap;
 mod keymaperror;
+mod libusbutils;
 mod neuftech;
 mod rfidreader;
 mod usbreader;
