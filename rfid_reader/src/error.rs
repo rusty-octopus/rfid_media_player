@@ -6,7 +6,7 @@ pub enum Error {
     LibUsbAccess,
     LibUsbNotFound,
     LibUsbOther(libusb::Error),
-    EndPointNotFound(u16, u16, String),
+    ReadableInterruptEndPointNotFound(u16, u16),
 }
 
 impl From<libusb::Error> for Error {

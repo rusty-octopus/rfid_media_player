@@ -26,11 +26,9 @@ fn get_device(
     Err(Error::DeviceNotFound(vendor_id, product_id))
 }
 
-fn get_readable_endpoint(
-    context: &Context,
+fn get_readable_interrupt_endpoint(
     device: &Device,
     device_descriptor: &DeviceDescriptor,
-    transfer_type: TransferType,
 ) -> Result<EndPoint, Error> {
     for n in 0..device_descriptor.num_configurations() {
         let config_description = match device.config_descriptor(n) {
@@ -41,7 +39,7 @@ fn get_readable_endpoint(
             for interface_description in interface.descriptors() {
                 for endpoint_descriptor in interface_description.endpoint_descriptors() {
                     if endpoint_descriptor.direction() == Direction::In
-                        && endpoint_descriptor.transfer_type() == transfer_type
+                        && endpoint_descriptor.transfer_type() == TransferType::Interrupt
                     {
                         return Ok(EndPoint {
                             config: config_description.number(),
@@ -54,10 +52,9 @@ fn get_readable_endpoint(
             }
         }
     }
-    Err(Error::EndPointNotFound(
+    Err(Error::ReadableInterruptEndPointNotFound(
         device_descriptor.vendor_id(),
         device_descriptor.product_id(),
-        format!("{:?}", transfer_type),
     ))
 }
 
@@ -88,12 +85,7 @@ mod tests {
         let result = get_device(&context, vendor_id, product_id);
         assert!(result.is_ok());
         let (device, device_descriptor) = result.unwrap();
-        let endpoint = get_readable_endpoint(
-            &context,
-            &device,
-            &device_descriptor,
-            TransferType::Interrupt,
-        );
+        let endpoint = get_readable_interrupt_endpoint(&device, &device_descriptor);
         assert!(endpoint.is_ok());
         assert_eq!(
             EndPoint {
