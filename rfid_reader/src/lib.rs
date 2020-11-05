@@ -3,6 +3,7 @@ mod keymap;
 mod keymaperror;
 mod libusbutils;
 mod neuftech;
+mod rawusbreader;
 mod rfidreader;
 mod usbreader;
 

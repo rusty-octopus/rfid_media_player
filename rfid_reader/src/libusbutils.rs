@@ -9,14 +9,26 @@ pub(crate) struct EndPoint {
     address: u8,
 }
 
-fn configure_device_handle(
+impl EndPoint {
+    pub(crate) fn get_interface(&self) -> u8 {
+        self.config
+    }
+    pub(crate) fn get_address(&self) -> u8 {
+        self.address
+    }
+}
+
+pub(crate) fn configure_device_handle(
     device_handle: &mut DeviceHandle,
     end_point: &EndPoint,
 ) -> Result<(), Error> {
-    todo!()
+    device_handle.set_active_configuration(end_point.config)?;
+    device_handle.claim_interface(end_point.interface)?;
+    device_handle.set_alternate_setting(end_point.interface, end_point.setting)?;
+    Ok(())
 }
 
-fn get_device(
+pub(crate) fn get_device(
     context: &Context,
     vendor_id: u16,
     product_id: u16,
@@ -33,7 +45,7 @@ fn get_device(
     Err(Error::DeviceNotFound(vendor_id, product_id))
 }
 
-fn get_readable_interrupt_endpoint(
+pub(crate) fn get_readable_interrupt_endpoint(
     device: &Device,
     device_descriptor: &DeviceDescriptor,
 ) -> Result<EndPoint, Error> {

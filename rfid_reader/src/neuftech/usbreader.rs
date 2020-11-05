@@ -2,6 +2,16 @@ use crate::usbreader::{UsbReader, UsbReaderError};
 
 pub(crate) struct NeuftechUsbReader;
 
+/*
+  libusbutils holds all convenience functions
+  NeuftechUsbReader or rawusbreader holds Context
+  on each new read, the device handle is opened again and made available again
+  Endpoint etc. is also stored
+  maybe on drop or on each read the kernel is attached again
+  Advanced option: Use thread and send data via channel, then on spawning the thread context,
+  device handle etc. can be kept alive in thread
+*/
+
 impl UsbReader for NeuftechUsbReader {
     fn read(&self) -> Box<[u8]> {
         let data = (0..10).collect::<Vec<u8>>().into_boxed_slice();
