@@ -3,6 +3,7 @@
 ## Open questions
 
 * Does a long timeout cost CPU cycles?
+  * Short showed: No!
 
 ## Device
 
