@@ -29,26 +29,26 @@ pub(crate) struct TestReader<'a> {
     device_handle: Option<DeviceHandle<'a>>,
 }
 
-impl<'a> TestReader<'a> {
-    fn new() -> Result<Self, Error> {
-        Ok(TestReader {
-            context: Context::new()?,
-            device_handle: None,
-        })
-    }
-    fn open(&mut self, vendor_id: u16, product_id: u16) -> Result<(), Error> {
-        let (device, device_descriptor) = get_device(&self.context, vendor_id, product_id)?;
-        let endpoint = get_readable_interrupt_endpoint(&device, &device_descriptor)?;
-        let mut device_handle = device.open()?;
-        let kernel_driver_active = device_handle.kernel_driver_active(endpoint.get_interface())?;
-        if kernel_driver_active {
-            device_handle.detach_kernel_driver(endpoint.get_interface())?
-        }
-        configure_device_handle(&mut device_handle, &endpoint)?;
-        self.device_handle = Some(device_handle);
-        Ok(())
-    }
-}
+//impl<'a> TestReader<'a> {
+//    fn new() -> Result<Self, Error> {
+//        Ok(TestReader {
+//            context: Context::new()?,
+//            device_handle: None,
+//        })
+//    }
+//    fn open(&mut self, vendor_id: u16, product_id: u16) -> Result<(), Error> {
+//        let (device, device_descriptor) = get_device(&self.context, vendor_id, product_id)?;
+//        let endpoint = get_readable_interrupt_endpoint(&device, &device_descriptor)?;
+//        let mut device_handle = device.open()?;
+//        let kernel_driver_active = device_handle.kernel_driver_active(endpoint.get_interface())?;
+//        if kernel_driver_active {
+//            device_handle.detach_kernel_driver(endpoint.get_interface())?
+//        }
+//        configure_device_handle(&mut device_handle, &endpoint)?;
+//        self.device_handle = Some(device_handle);
+//        Ok(())
+//    }
+//}
 
 impl RawUsbReader for RawInterruptUsbReader {
     fn open(context: &Context, vendor_id: u16, product_id: u16) -> Result<Self, Error> {
