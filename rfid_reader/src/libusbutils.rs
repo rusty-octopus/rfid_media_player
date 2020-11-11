@@ -1,4 +1,5 @@
 use crate::error::Error;
+use crate::id::{ProductId, VendorId};
 use libusb::{Context, Device, DeviceDescriptor, DeviceHandle, Direction, TransferType};
 
 #[derive(Debug, PartialEq)]
@@ -30,14 +31,14 @@ pub(crate) fn configure_device_handle(
 
 pub(crate) fn get_device(
     context: &Context,
-    vendor_id: u16,
-    product_id: u16,
+    vendor_id: VendorId,
+    product_id: ProductId,
 ) -> Result<(Device, DeviceDescriptor), Error> {
     let devices = context.devices()?;
     for device in devices.iter() {
         let device_descriptor = device.device_descriptor()?;
-        if device_descriptor.vendor_id() == vendor_id
-            && device_descriptor.product_id() == product_id
+        if device_descriptor.vendor_id() == vendor_id.into()
+            && device_descriptor.product_id() == product_id.into()
         {
             return Ok((device, device_descriptor));
         }
@@ -83,14 +84,15 @@ mod tests {
     #[test]
     fn test_get_device_not_found() {
         let context = Context::new().unwrap();
-        let device = get_device(&context, 0, 0);
+        let device = get_device(&context, VendorId::from(0), ProductId::from(0));
         assert!(device.is_err());
     }
 
     #[test]
     fn test_get_device() {
         let context = Context::new().unwrap();
-        let device = get_device(&context, 0x0cf3, 0x3005);
+        let device = get_device(&context, VendorId::from(0x0cf3), ProductId::from(0x3005));
+
         assert!(device.is_ok());
     }
 
@@ -99,8 +101,8 @@ mod tests {
         let context = Context::new().unwrap();
 
         // readable device in my system, change these two values in your system
-        let vendor_id = 0x0cf3;
-        let product_id = 0x3005;
+        let vendor_id = VendorId::from(0x0cf3);
+        let product_id = ProductId::from(0x3005);
         let result = get_device(&context, vendor_id, product_id);
         assert!(result.is_ok());
         let (device, device_descriptor) = result.unwrap();

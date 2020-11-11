@@ -1,3 +1,4 @@
+use crate::id::{ProductId, VendorId};
 use crate::libusbutils::{
     configure_device_handle, get_device, get_readable_interrupt_endpoint, EndPoint,
 };
@@ -6,7 +7,7 @@ use libusb::{Context, Device, DeviceDescriptor, DeviceHandle};
 use std::time::Duration;
 
 pub(crate) trait RawUsbReader {
-    fn open(context: &Context, vendor_id: u16, product_id: u16) -> Result<Self, Error>
+    fn open(context: &Context, vendor_id: VendorId, product_id: ProductId) -> Result<Self, Error>
     where
         Self: Sized;
     fn read(
@@ -51,7 +52,7 @@ pub(crate) struct TestReader<'a> {
 //}
 
 impl RawUsbReader for RawInterruptUsbReader {
-    fn open(context: &Context, vendor_id: u16, product_id: u16) -> Result<Self, Error> {
+    fn open(context: &Context, vendor_id: VendorId, product_id: ProductId) -> Result<Self, Error> {
         let context = Context::new()?;
         let (device, device_descriptor) = get_device(&context, vendor_id, product_id)?;
         let endpoint = get_readable_interrupt_endpoint(&device, &device_descriptor)?;

@@ -1,7 +1,8 @@
+use crate::id::{ProductId, VendorId};
 use libusb;
 #[derive(Debug)]
 pub enum Error {
-    DeviceNotFound(u16, u16),
+    DeviceNotFound(VendorId, ProductId),
     LibUsbTimeout,
     LibUsbNoDevice,
     LibUsbAccess,

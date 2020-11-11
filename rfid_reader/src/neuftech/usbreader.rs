@@ -1,6 +1,19 @@
-use crate::usbreader::{UsbReader, UsbReaderError};
+use crate::error::Error;
+use crate::libusbutils::EndPoint;
+use crate::usbreader::UsbReader;
+use libusb::{Context, Device, DeviceDescriptor, DeviceHandle};
 
-pub(crate) struct NeuftechUsbReader;
+pub(crate) struct NeuftechUsbReader {
+    kernel_driver_attached: bool,
+    endpoint: EndPoint,
+    device_descriptor: DeviceDescriptor,
+}
+
+impl NeuftechUsbReader {
+    pub(crate) fn open() -> Result<Self, Error> {
+        todo!();
+    }
+}
 
 /*
   libusbutils holds all convenience functions

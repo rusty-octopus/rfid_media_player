@@ -1,6 +1,9 @@
+use crate::error::Error;
+use crate::id::{ProductId, VendorId};
 use crate::keymap::{Key, KeyMap};
 use crate::neuftech::{NeuftechKeyMap, NeuftechUsbReader};
 use crate::usbreader::UsbReader;
+
 use std::time::Duration;
 
 pub trait RfidReader {
@@ -41,12 +44,12 @@ pub enum RfidReaderError {
 }
 
 pub fn open(
-    vendor_id: u16,
-    product_id: u16,
+    vendor_id: VendorId,
+    product_id: ProductId,
     timeout: Duration,
-) -> Result<impl RfidReader, RfidReaderError> {
+) -> Result<impl RfidReader, Error> {
     let keymap = NeuftechKeyMap;
-    let usbreader = NeuftechUsbReader;
+    let usbreader = NeuftechUsbReader::open()?;
     Ok(GenericRfidReader::from(keymap, usbreader))
 }
 
