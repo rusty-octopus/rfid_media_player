@@ -1,4 +1,4 @@
-use crate::keymaperror::KeyMapError;
+use crate::error::Error;
 
 #[derive(Debug, PartialEq)]
 pub(crate) enum Key {
@@ -6,7 +6,7 @@ pub(crate) enum Key {
     Enter,
 }
 pub(crate) trait KeyMap {
-    fn map(&self, key: u8) -> Result<Key, KeyMapError>;
+    fn map(&self, key: u8) -> Result<Key, Error>;
 }
 
 impl Into<char> for Key {

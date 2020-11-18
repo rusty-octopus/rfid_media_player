@@ -20,6 +20,7 @@ pub enum Error {
     ReadableInterruptEndPointNotFound(VendorId, ProductId),
     InvalidData,
     TooFewReceivedData,
+    KeyNotExisting(u8),
 }
 
 impl From<libusb::Error> for Error {

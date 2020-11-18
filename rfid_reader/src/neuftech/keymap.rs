@@ -1,10 +1,10 @@
+use crate::error::Error;
 use crate::keymap::{Key, KeyMap};
-use crate::keymaperror::KeyMapError;
 
 pub struct NeuftechKeyMap;
 
 impl KeyMap for NeuftechKeyMap {
-    fn map(&self, key: u8) -> Result<Key, KeyMapError> {
+    fn map(&self, key: u8) -> Result<Key, Error> {
         const OFFSET_KEY_TO_UTF8: u8 = 0x13;
         match key {
             // Key board codes are 30-30 for keys 1-9 (utf8 hex values 0x31-0x39)
@@ -14,7 +14,7 @@ impl KeyMap for NeuftechKeyMap {
             // Key board code for 40 is Enter
             40 => Ok(Key::Enter),
             // Neuftech should only report numbers, enter or control codes
-            _ => Err(KeyMapError::from_key_not_existing(key)),
+            _ => Err(Error::KeyNotExisting(key)),
         }
     }
 }
@@ -27,9 +27,8 @@ mod tests {
     #[test]
     fn test_digits() {
         let keymap = NeuftechKeyMap;
-        let digits: Vec<Result<Key, KeyMapError>> =
-            ('1'..='9').map(|c| Ok(Key::Digit(c))).collect();
-        let mapped_keys: Vec<Result<Key, KeyMapError>> = (30..39)
+        let digits: Vec<Result<Key, Error>> = ('1'..='9').map(|c| Ok(Key::Digit(c))).collect();
+        let mapped_keys: Vec<Result<Key, Error>> = (30..39)
             .map(|i| keymap.map(usize::try_into(i).unwrap()))
             .collect();
         assert_eq!(digits, mapped_keys);
@@ -45,6 +44,6 @@ mod tests {
     #[test]
     fn test_error() {
         let keymap = NeuftechKeyMap;
-        assert_eq!(Err(KeyMapError::from_key_not_existing(17)), keymap.map(17));
+        assert_eq!(Err(Error::KeyNotExisting(17)), keymap.map(17));
     }
 }

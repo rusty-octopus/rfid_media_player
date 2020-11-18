@@ -53,7 +53,6 @@ pub fn open(
 mod tests {
     use super::*;
     use crate::keymap::Key;
-    use crate::keymaperror::KeyMapError;
 
     struct MockUsbReader;
 
@@ -66,7 +65,7 @@ mod tests {
 
     struct MockKeyMap;
     impl KeyMap for MockKeyMap {
-        fn map(&self, key: u8) -> Result<Key, KeyMapError> {
+        fn map(&self, key: u8) -> Result<Key, Error> {
             Ok(Key::Digit(
                 std::char::from_digit(u8::into(key), 10).unwrap(),
             ))
