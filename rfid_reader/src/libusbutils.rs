@@ -73,8 +73,8 @@ pub(crate) fn get_readable_interrupt_endpoint(
         }
     }
     Err(Error::ReadableInterruptEndPointNotFound(
-        device_descriptor.vendor_id(),
-        device_descriptor.product_id(),
+        device_descriptor.vendor_id().into(),
+        device_descriptor.product_id().into(),
     ))
 }
 

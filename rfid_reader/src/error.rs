@@ -1,22 +1,44 @@
 use crate::id::{ProductId, VendorId};
 use libusb;
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Error {
     DeviceNotFound(VendorId, ProductId),
     LibUsbTimeout,
     LibUsbNoDevice,
-    LibUsbAccess,
     LibUsbNotFound,
-    LibUsbOther(libusb::Error),
-    ReadableInterruptEndPointNotFound(u16, u16),
+    LibUsbSuccess,
+    LibUsbIo,
+    LibUsbInvalidParam,
+    LibUsbAccess,
+    LibUsbBusy,
+    LibUsbOverflow,
+    LibUsbPipe,
+    LibUsbInterrupted,
+    LibUsbNoMem,
+    LibUsbNotSupported,
+    LibUsbOther,
+    ReadableInterruptEndPointNotFound(VendorId, ProductId),
+    InvalidData,
+    TooFewReceivedData,
 }
 
 impl From<libusb::Error> for Error {
     fn from(error: libusb::Error) -> Self {
         match error {
-            libusb::Error::NoDevice => Self::LibUsbAccess,
+            libusb::Error::NoDevice => Self::LibUsbNoDevice,
             libusb::Error::Timeout => Self::LibUsbTimeout,
-            _ => Self::LibUsbOther(error),
+            libusb::Error::Access => Self::LibUsbAccess,
+            libusb::Error::Busy => Self::LibUsbBusy,
+            libusb::Error::Interrupted => Self::LibUsbInterrupted,
+            libusb::Error::InvalidParam => Self::LibUsbInvalidParam,
+            libusb::Error::Io => Self::LibUsbIo,
+            libusb::Error::NoMem => Self::LibUsbNoMem,
+            libusb::Error::NotFound => Self::LibUsbNotFound,
+            libusb::Error::NotSupported => Self::LibUsbNotSupported,
+            libusb::Error::Other => Self::LibUsbOther,
+            libusb::Error::Success => Self::LibUsbSuccess,
+            libusb::Error::Overflow => Self::LibUsbOverflow,
+            libusb::Error::Pipe => Self::LibUsbPipe,
         }
     }
 }

@@ -2,6 +2,12 @@
 
 ## Todos
 
+* USB Reader as Humble Object?
+  * [UI Archs](https://martinfowler.com/eaaDev/uiArchs.html)
+  * Gerard Meszaros<http://xunitpatterns.com> generalized this notion to idea of a Humble Object - any object that is difficult to test should have minimal behavior."
+  * [Test double](https://martinfowler.com/bliki/TestDouble.html)
+* Fix Lib Usb Error Mess
+* Use less allocations?
 * Implement Neuftech reader with as much as possible using libusbutils
   * Neuftech reader just stores COntext, Endpoint etc. but not Device, Device handle etc.
   * Device, DeviceHandle is opened on each Neuftech read, which are several reads on the USB devices

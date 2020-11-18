@@ -1,3 +1,4 @@
+use crate::error::Error;
 pub(crate) trait UsbReader {
-    fn read(&self) -> Box<[u8]>;
+    fn read(&self) -> Result<Box<[u8]>, Error>;
 }

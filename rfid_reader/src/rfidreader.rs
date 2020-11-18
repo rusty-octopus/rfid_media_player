@@ -7,7 +7,7 @@ use crate::usbreader::UsbReader;
 use std::time::Duration;
 
 pub trait RfidReader {
-    fn read(&self) -> String;
+    fn read(&self) -> Result<String, Error>;
 }
 
 struct GenericRfidReader<K: KeyMap, U: UsbReader> {
@@ -22,8 +22,8 @@ impl<K: KeyMap, U: UsbReader> GenericRfidReader<K, U> {
 }
 
 impl<K: KeyMap, U: UsbReader> RfidReader for GenericRfidReader<K, U> {
-    fn read(&self) -> String {
-        let raw_data = self.usbreader.read();
+    fn read(&self) -> Result<String, Error> {
+        let raw_data = self.usbreader.read()?;
         let mut rfid_value = String::with_capacity(10);
         for raw_value in raw_data.iter() {
             let key = self.keymap.map(*raw_value);
@@ -35,12 +35,8 @@ impl<K: KeyMap, U: UsbReader> RfidReader for GenericRfidReader<K, U> {
                 }
             }
         }
-        rfid_value
+        Ok(rfid_value)
     }
-}
-
-pub enum RfidReaderError {
-    DeviceNotFound,
 }
 
 pub fn open(
@@ -49,7 +45,7 @@ pub fn open(
     timeout: Duration,
 ) -> Result<impl RfidReader, Error> {
     let keymap = NeuftechKeyMap;
-    let usbreader = NeuftechUsbReader::open()?;
+    let usbreader = NeuftechUsbReader::open(vendor_id, product_id, timeout)?;
     Ok(GenericRfidReader::from(keymap, usbreader))
 }
 
@@ -62,9 +58,9 @@ mod tests {
     struct MockUsbReader;
 
     impl UsbReader for MockUsbReader {
-        fn read(&self) -> Box<[u8]> {
+        fn read(&self) -> Result<Box<[u8]>, Error> {
             let data = (0..10).collect::<Vec<u8>>().into_boxed_slice();
-            data
+            Ok(data)
         }
     }
 
@@ -82,7 +78,7 @@ mod tests {
         let usb_reader = MockUsbReader;
         let key_map = MockKeyMap;
         let rfid_reader = GenericRfidReader::from(key_map, usb_reader);
-        let rfid = rfid_reader.read();
+        let rfid = rfid_reader.read().unwrap();
         assert_eq!("0123456789", rfid);
     }
 }

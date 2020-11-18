@@ -1,17 +1,59 @@
 use crate::error::Error;
-use crate::libusbutils::EndPoint;
+use crate::id::{ProductId, VendorId};
+use crate::libusbutils::{
+    configure_device_handle, get_device, get_readable_interrupt_endpoint, EndPoint,
+};
 use crate::usbreader::UsbReader;
-use libusb::{Context, Device, DeviceDescriptor, DeviceHandle};
+use libusb::Context;
+use std::time::Duration;
 
 pub(crate) struct NeuftechUsbReader {
     kernel_driver_attached: bool,
     endpoint: EndPoint,
-    device_descriptor: DeviceDescriptor,
+    vendor_id: VendorId,
+    product_id: ProductId,
+    timeout: Duration,
 }
 
 impl NeuftechUsbReader {
-    pub(crate) fn open() -> Result<Self, Error> {
-        todo!();
+    pub(crate) fn open(
+        vendor_id: VendorId,
+        product_id: ProductId,
+        timeout: Duration,
+    ) -> Result<Self, Error> {
+        let context = Context::new()?;
+        let (device, device_descriptor) = get_device(&context, vendor_id, product_id)?;
+        let endpoint = get_readable_interrupt_endpoint(&device, &device_descriptor)?;
+        let mut device_handle = device.open()?;
+        let kernel_driver_attached =
+            device_handle.kernel_driver_active(endpoint.get_interface())?;
+        if kernel_driver_attached {
+            device_handle.detach_kernel_driver(endpoint.get_interface())?;
+        }
+        configure_device_handle(&mut device_handle, &endpoint)?;
+        Ok(NeuftechUsbReader {
+            kernel_driver_attached,
+            endpoint,
+            vendor_id,
+            product_id,
+            timeout,
+        })
+    }
+}
+
+impl Drop for NeuftechUsbReader {
+    fn drop(&mut self) {
+        if self.kernel_driver_attached {
+            let context = Context::new().unwrap();
+            let (device, _) = get_device(&context, self.vendor_id, self.product_id).unwrap();
+            let mut device_handle = device.open().unwrap();
+            device_handle
+                .attach_kernel_driver(self.endpoint.get_interface())
+                .unwrap();
+            device_handle
+                .release_interface(self.endpoint.get_interface())
+                .unwrap();
+        }
     }
 }
 
@@ -26,9 +68,23 @@ impl NeuftechUsbReader {
 */
 
 impl UsbReader for NeuftechUsbReader {
-    fn read(&self) -> Box<[u8]> {
-        let data = (0..10).collect::<Vec<u8>>().into_boxed_slice();
-        data
+    fn read(&self) -> Result<Box<[u8]>, Error> {
+        let context = Context::new()?;
+        let (device, _) = get_device(&context, self.vendor_id, self.product_id)?;
+        let device_handle = device.open()?;
+        let mut raw_data_interpreter = RawDataInterpreter::default();
+        let mut buffer = [0; 3];
+        while !raw_data_interpreter.finished_processing() {
+            let result = device_handle.read_interrupt(
+                self.endpoint.get_address(),
+                &mut buffer,
+                self.timeout,
+            );
+            if result.is_ok() {
+                raw_data_interpreter.process(&buffer)?;
+            }
+        }
+        Ok(Box::new(raw_data_interpreter.data))
     }
 }
 
@@ -40,25 +96,19 @@ enum RawDataInterpretation {
 }
 
 impl RawDataInterpretation {
-    fn from(data: &[u8]) -> Result<RawDataInterpretation, NeuftechError> {
+    fn from(data: &[u8]) -> Result<RawDataInterpretation, Error> {
         if data.len() >= 3 {
             let value = data[2];
             let return_value = match value {
                 0 => Ok(Self::Repeated),
                 30..=39 => Ok(Self::Value(value)),
                 40 => Ok(Self::Enter),
-                _ => Err(NeuftechError::InvalidData),
+                _ => Err(Error::InvalidData),
             };
             return return_value;
         }
-        Err(NeuftechError::TooFewReceivedData)
+        Err(Error::TooFewReceivedData)
     }
-}
-
-#[derive(Debug, PartialEq)]
-enum NeuftechError {
-    TooFewReceivedData,
-    InvalidData,
 }
 
 struct RawDataInterpreter {
@@ -80,7 +130,7 @@ impl Default for RawDataInterpreter {
 }
 
 impl RawDataInterpreter {
-    fn process(&mut self, raw_data: &[u8]) -> Result<(), NeuftechError> {
+    fn process(&mut self, raw_data: &[u8]) -> Result<(), Error> {
         let raw_data_interpretation = RawDataInterpretation::from(raw_data)?;
         match raw_data_interpretation {
             RawDataInterpretation::Value(value) => {
@@ -102,11 +152,6 @@ impl RawDataInterpreter {
     fn finished_processing(&self) -> bool {
         self.finished
     }
-    fn reset(&mut self) {
-        self.finished = false;
-        self.last = None;
-        self.index = 0;
-    }
 }
 
 #[cfg(test)]
@@ -117,7 +162,7 @@ mod tests {
     fn test_raw_data_interpretation() {
         let data: [u8; 1] = [0];
         let result = RawDataInterpretation::from(&data);
-        assert_eq!(Err(NeuftechError::TooFewReceivedData), result);
+        assert_eq!(Err(Error::TooFewReceivedData), result);
 
         let data: [u8; 3] = [1, 0, 39];
         let result = RawDataInterpretation::from(&data);
@@ -137,11 +182,11 @@ mod tests {
             assert!(!interpreter.finished_processing());
         }
         let enter_data = [1, 0, 40];
-        interpreter.process(&enter_data);
+        interpreter.process(&enter_data).unwrap();
         assert!(!interpreter.finished_processing());
 
         let ignore_data = [1, 0, 0];
-        interpreter.process(&ignore_data);
+        interpreter.process(&ignore_data).unwrap();
         assert!(interpreter.finished_processing());
     }
 }
