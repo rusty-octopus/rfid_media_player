@@ -23,6 +23,14 @@ pub enum Error {
     KeyNotExisting(u8),
 }
 
+impl std::error::Error for Error {}
+
+impl std::fmt::Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
 impl From<libusb::Error> for Error {
     fn from(error: libusb::Error) -> Self {
         match error {

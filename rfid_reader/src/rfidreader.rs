@@ -6,7 +6,7 @@ use crate::usbreader::UsbReader;
 
 use std::time::Duration;
 
-pub trait RfidReader {
+pub trait RfidReader: std::fmt::Debug {
     fn read(&self) -> Result<String, Error>;
 }
 
@@ -18,6 +18,15 @@ struct GenericRfidReader<K: KeyMap, U: UsbReader> {
 impl<K: KeyMap, U: UsbReader> GenericRfidReader<K, U> {
     fn from(keymap: K, usbreader: U) -> GenericRfidReader<K, U> {
         GenericRfidReader { keymap, usbreader }
+    }
+}
+
+impl<K: KeyMap, U: UsbReader> std::fmt::Debug for GenericRfidReader<K, U> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("GenericRfidReader")
+            .field("keymap", &self.keymap)
+            .field("usbreader", &self.usbreader)
+            .finish()
     }
 }
 
@@ -63,12 +72,24 @@ mod tests {
         }
     }
 
+    impl std::fmt::Debug for MockUsbReader {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            f.debug_struct("MockUsbReader").finish()
+        }
+    }
+
     struct MockKeyMap;
     impl KeyMap for MockKeyMap {
         fn map(&self, key: u8) -> Result<Key, Error> {
             Ok(Key::Digit(
                 std::char::from_digit(u8::into(key), 10).unwrap(),
             ))
+        }
+    }
+
+    impl std::fmt::Debug for MockKeyMap {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            f.debug_struct("MockKeyMap").finish()
         }
     }
 

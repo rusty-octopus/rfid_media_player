@@ -19,6 +19,12 @@ impl KeyMap for NeuftechKeyMap {
     }
 }
 
+impl std::fmt::Debug for NeuftechKeyMap {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("NeuftechKeyMap").finish()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

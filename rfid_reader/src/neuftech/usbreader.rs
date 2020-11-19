@@ -15,6 +15,12 @@ pub(crate) struct NeuftechUsbReader {
     timeout: Duration,
 }
 
+impl std::fmt::Debug for NeuftechUsbReader {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("NeuftechUsbReader").finish()
+    }
+}
+
 impl NeuftechUsbReader {
     pub(crate) fn open(
         vendor_id: VendorId,

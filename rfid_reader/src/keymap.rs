@@ -5,7 +5,7 @@ pub(crate) enum Key {
     Digit(char),
     Enter,
 }
-pub(crate) trait KeyMap {
+pub(crate) trait KeyMap: std::fmt::Debug {
     fn map(&self, key: u8) -> Result<Key, Error>;
 }
 
