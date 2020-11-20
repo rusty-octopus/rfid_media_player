@@ -17,6 +17,12 @@ impl EndPoint {
     pub(crate) fn get_address(&self) -> u8 {
         self.address
     }
+    pub(crate) fn get_config(&self) -> u8 {
+        self.config
+    }
+    pub(crate) fn get_setting(&self) -> u8 {
+        self.config
+    }
 }
 
 pub(crate) fn configure_device_handle<T: UsbContext>(

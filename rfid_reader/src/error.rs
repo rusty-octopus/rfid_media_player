@@ -9,7 +9,7 @@ pub enum Error {
     InvalidData,
     TooFewReceivedData,
     KeyNotExisting(u8),
-    RusbError(rusb::Error),
+    OtherUsbError(String),
 }
 
 impl std::error::Error for Error {}
@@ -25,7 +25,7 @@ impl From<rusb::Error> for Error {
         match error {
             rusb::Error::Timeout => Self::Timeout,
             rusb::Error::Access => Self::Access,
-            _ => Self::RusbError(error),
+            _ => Self::OtherUsbError(error.to_string()),
         }
     }
 }
