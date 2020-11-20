@@ -1,10 +1,8 @@
-extern crate libusb;
+extern crate rusb;
 use std::time::Duration;
 
 fn main() {
-    let context = libusb::Context::new().unwrap();
-
-    for device in context.devices().unwrap().iter() {
+    for device in rusb::devices().unwrap().iter() {
         let device_desc = device.device_descriptor().unwrap();
 
         println!(
@@ -16,9 +14,8 @@ fn main() {
         );
     }
 
-    let mut device_handle = context
-        .open_device_with_vid_pid(0x16c0, 0x27db)
-        .expect("device not found");
+    let mut device_handle =
+        rusb::open_device_with_vid_pid(0x16c0, 0x27db).expect("device not found");
     let active_configuration = device_handle.active_configuration();
     println!("Active configuraton: {:?}", active_configuration);
     //device_handle.reset().unwrap();

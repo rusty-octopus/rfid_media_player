@@ -19,3 +19,5 @@
   * Lint
   * Test Coverage
   * Example / Integration test with actual Reader?
+* Cross compile
+  * [cross compile lib usb](https://github.com/dcuddeback/libusb-sys#cross-compiling)

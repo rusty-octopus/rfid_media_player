@@ -1,10 +1,10 @@
 use crate::error::Error;
 use crate::id::{ProductId, VendorId};
-use crate::libusbutils::{
+use crate::rusbutils::{
     configure_device_handle, get_device, get_readable_interrupt_endpoint, EndPoint,
 };
 use crate::usbreader::UsbReader;
-use libusb::Context;
+use rusb::Context;
 use std::time::Duration;
 
 pub(crate) struct NeuftechUsbReader {

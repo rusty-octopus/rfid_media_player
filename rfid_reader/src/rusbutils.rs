@@ -1,6 +1,6 @@
 use crate::error::Error;
 use crate::id::{ProductId, VendorId};
-use libusb::{Context, Device, DeviceDescriptor, DeviceHandle, Direction, TransferType};
+use rusb::{Context, Device, DeviceDescriptor, DeviceHandle, Direction, TransferType, UsbContext};
 
 #[derive(Debug, PartialEq)]
 pub(crate) struct EndPoint {
@@ -19,8 +19,8 @@ impl EndPoint {
     }
 }
 
-pub(crate) fn configure_device_handle(
-    device_handle: &mut DeviceHandle,
+pub(crate) fn configure_device_handle<T: UsbContext>(
+    device_handle: &mut DeviceHandle<T>,
     end_point: &EndPoint,
 ) -> Result<(), Error> {
     device_handle.set_active_configuration(end_point.config)?;
@@ -29,11 +29,11 @@ pub(crate) fn configure_device_handle(
     Ok(())
 }
 
-pub(crate) fn get_device(
-    context: &Context,
+pub(crate) fn get_device<T: UsbContext>(
+    context: &T,
     vendor_id: VendorId,
     product_id: ProductId,
-) -> Result<(Device, DeviceDescriptor), Error> {
+) -> Result<(Device<T>, DeviceDescriptor), Error> {
     let devices = context.devices()?;
     for device in devices.iter() {
         let device_descriptor = device.device_descriptor()?;
@@ -46,8 +46,8 @@ pub(crate) fn get_device(
     Err(Error::DeviceNotFound(vendor_id, product_id))
 }
 
-pub(crate) fn get_readable_interrupt_endpoint(
-    device: &Device,
+pub(crate) fn get_readable_interrupt_endpoint<T: UsbContext>(
+    device: &Device<T>,
     device_descriptor: &DeviceDescriptor,
 ) -> Result<EndPoint, Error> {
     for n in 0..device_descriptor.num_configurations() {

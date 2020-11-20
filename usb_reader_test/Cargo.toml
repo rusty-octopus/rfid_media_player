@@ -5,4 +5,4 @@ authors = ["rusty-octopus <octopus@posteo.net>"]
 edition = "2018"
 
 [dependencies]
-libusb = "0.3"
+rusb = "0.6.5"

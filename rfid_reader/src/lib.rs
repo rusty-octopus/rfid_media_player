@@ -1,9 +1,10 @@
 mod error;
+mod humbleusbdevice;
 mod id;
 mod keymap;
-mod libusbutils;
 mod neuftech;
 mod rfidreader;
+mod rusbutils;
 mod usbreader;
 
 pub use error::Error;
