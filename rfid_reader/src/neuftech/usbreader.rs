@@ -1,6 +1,6 @@
 use crate::error::Error;
 use crate::id::{ProductId, VendorId};
-use crate::rusbutils::{
+use crate::rusb::utils::{
     configure_device_handle, get_device, get_readable_interrupt_endpoint, EndPoint,
 };
 use crate::usbreader::UsbReader;
@@ -35,8 +35,9 @@ impl NeuftechUsbReader {
             device_handle.kernel_driver_active(endpoint.get_interface())?;
         if kernel_driver_attached {
             device_handle.detach_kernel_driver(endpoint.get_interface())?;
+            configure_device_handle(&mut device_handle, &endpoint)?;
         }
-        configure_device_handle(&mut device_handle, &endpoint)?;
+
         Ok(NeuftechUsbReader {
             kernel_driver_attached,
             endpoint,

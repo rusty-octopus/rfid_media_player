@@ -13,6 +13,9 @@
   * Gerard Meszaros<http://xunitpatterns.com> generalized this notion to idea of a Humble Object - any object that is difficult to test should have minimal behavior."
   * [Test double](https://martinfowler.com/bliki/TestDouble.html)
 * Reconsider Implementation of Drop, seem unsafe since it can panic
+  * Add deinit to RfidReader as well
+  * Catch sigterm and call deinit
+  * This means drop and deinit exists
 * Use less allocations?
 * Fix Error
   * One global Error Type (besides Neuftech internal errors)
@@ -25,4 +28,5 @@
   * Test Coverage
   * Example / Integration test with actual Reader?
 * Cross compile
+  * [cross compile rusb](https://github.com/a1ien/libusb1-sys#cross-compiling)
   * [cross compile lib usb](https://github.com/dcuddeback/libusb-sys#cross-compiling)

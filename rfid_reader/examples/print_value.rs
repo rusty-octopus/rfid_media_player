@@ -12,10 +12,13 @@ fn main() {
             let read_result = reader.read();
             match read_result {
                 Ok(value) => println!("Value: {}", value),
-                Err(error) => println!("Error: {}", error),
+                Err(error) => println!("Read Error: {}", error),
             }
         }
     } else {
-        println!("Error: {:?}", reader.unwrap_err());
+        println!(
+            "Reader could not be opened. Error: {:?}",
+            reader.unwrap_err()
+        );
     }
 }

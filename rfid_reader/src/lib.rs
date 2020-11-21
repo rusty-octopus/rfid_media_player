@@ -4,7 +4,7 @@ mod id;
 mod keymap;
 mod neuftech;
 mod rfidreader;
-mod rusbutils;
+mod rusb;
 mod usbreader;
 
 pub use error::Error;
