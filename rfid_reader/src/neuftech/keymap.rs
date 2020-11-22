@@ -1,3 +1,7 @@
+#![warn(missing_docs)]
+#![warn(missing_doc_code_examples)]
+#![forbid(unsafe_code)]
+
 use crate::error::Error;
 use crate::keymap::{Key, KeyMap};
 
@@ -26,6 +30,7 @@ impl std::fmt::Debug for NeuftechKeyMap {
 }
 
 #[cfg(test)]
+#[cfg(not(tarpaulin_include))]
 mod tests {
     use super::*;
     use std::convert::TryInto;
@@ -51,5 +56,11 @@ mod tests {
     fn test_error() {
         let keymap = NeuftechKeyMap;
         assert_eq!(Err(Error::KeyNotExisting(17)), keymap.map(17));
+    }
+
+    #[test]
+    fn test_debug() {
+        let key_map = NeuftechKeyMap;
+        assert_eq!("NeuftechKeyMap", format!("{:?}", key_map));
     }
 }

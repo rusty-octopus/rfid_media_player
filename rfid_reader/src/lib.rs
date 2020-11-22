@@ -1,3 +1,7 @@
+#![warn(missing_docs)]
+#![warn(missing_doc_code_examples)]
+#![forbid(unsafe_code)]
+
 mod error;
 mod humbleusbdevice;
 mod id;

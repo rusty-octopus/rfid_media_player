@@ -1,97 +1,74 @@
+#![warn(missing_docs)]
+#![warn(missing_doc_code_examples)]
+#![forbid(unsafe_code)]
+
 use crate::error::Error;
+use crate::humbleusbdevice::HumbleUsbDevice;
 use crate::id::{ProductId, VendorId};
-use crate::rusb::utils::{
-    configure_device_handle, get_device, get_readable_interrupt_endpoint, EndPoint,
-};
+use crate::rusb;
+
 use crate::usbreader::UsbReader;
-use rusb::Context;
+
 use std::time::Duration;
 
-pub(crate) struct NeuftechUsbReader {
-    kernel_driver_attached: bool,
-    endpoint: EndPoint,
-    vendor_id: VendorId,
-    product_id: ProductId,
-    timeout: Duration,
+pub(crate) struct NeuftechUsbReader<T>
+where
+    T: HumbleUsbDevice,
+{
+    usb_device: T,
 }
 
-impl std::fmt::Debug for NeuftechUsbReader {
+impl<T: HumbleUsbDevice> std::fmt::Debug for NeuftechUsbReader<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("NeuftechUsbReader").finish()
     }
 }
 
-impl NeuftechUsbReader {
-    pub(crate) fn open(
-        vendor_id: VendorId,
-        product_id: ProductId,
-        timeout: Duration,
-    ) -> Result<Self, Error> {
-        let context = Context::new()?;
-        let (device, device_descriptor) = get_device(&context, vendor_id, product_id)?;
-        let endpoint = get_readable_interrupt_endpoint(&device, &device_descriptor)?;
-        let mut device_handle = device.open()?;
-        let kernel_driver_attached =
-            device_handle.kernel_driver_active(endpoint.get_interface())?;
-        if kernel_driver_attached {
-            device_handle.detach_kernel_driver(endpoint.get_interface())?;
-            configure_device_handle(&mut device_handle, &endpoint)?;
-        }
+#[cfg(not(tarpaulin_include))]
+pub(crate) fn open(
+    vendor_id: VendorId,
+    product_id: ProductId,
+    timeout: Duration,
+) -> Result<impl UsbReader, Error> {
+    let usb_device = rusb::open(vendor_id, product_id, timeout)?;
+    NeuftechUsbReader::new(usb_device)
+}
 
-        Ok(NeuftechUsbReader {
-            kernel_driver_attached,
-            endpoint,
-            vendor_id,
-            product_id,
-            timeout,
-        })
+impl<T: HumbleUsbDevice> NeuftechUsbReader<T> {
+    fn new(usb_device: T) -> Result<Self, Error> {
+        let mut usb_device = usb_device;
+        usb_device.initialize()?;
+        Ok(NeuftechUsbReader { usb_device })
     }
 }
 
-impl Drop for NeuftechUsbReader {
+impl<T: HumbleUsbDevice> Drop for NeuftechUsbReader<T> {
     fn drop(&mut self) {
-        if self.kernel_driver_attached {
-            let context = Context::new().unwrap();
-            let (device, _) = get_device(&context, self.vendor_id, self.product_id).unwrap();
-            let mut device_handle = device.open().unwrap();
-            device_handle
-                .attach_kernel_driver(self.endpoint.get_interface())
-                .unwrap();
-            device_handle
-                .release_interface(self.endpoint.get_interface())
-                .unwrap();
-        }
+        self.deinitialize().unwrap();
     }
 }
 
-/*
-  libusbutils holds all convenience functions
-  NeuftechUsbReader or rawusbreader holds Context
-  on each new read, the device handle is opened again and made available again
-  Endpoint etc. is also stored
-  maybe on drop or on each read the kernel is attached again
-  Advanced option: Use thread and send data via channel, then on spawning the thread context,
-  device handle etc. can be kept alive in thread
-*/
-
-impl UsbReader for NeuftechUsbReader {
+impl<T: HumbleUsbDevice> UsbReader for NeuftechUsbReader<T> {
     fn read(&self) -> Result<Box<[u8]>, Error> {
-        let context = Context::new()?;
-        let (device, _) = get_device(&context, self.vendor_id, self.product_id)?;
-        let device_handle = device.open()?;
         let mut raw_data_interpreter = RawDataInterpreter::default();
         let mut buffer = [0; 3];
         while !raw_data_interpreter.finished_processing() {
-            let result = device_handle.read_interrupt(
-                self.endpoint.get_address(),
-                &mut buffer,
-                self.timeout,
-            );
+            let result = self.usb_device.read(&mut buffer);
             if result.is_ok() {
                 raw_data_interpreter.process(&buffer)?;
+            } else {
+                let error = result.unwrap_err();
+                if error == Error::Timeout {
+                    continue;
+                } else {
+                    return Err(error);
+                }
             }
         }
         Ok(Box::new(raw_data_interpreter.data))
+    }
+    fn deinitialize(&mut self) -> Result<(), Error> {
+        self.usb_device.deinitialize()
     }
 }
 
@@ -162,8 +139,98 @@ impl RawDataInterpreter {
 }
 
 #[cfg(test)]
+#[cfg(not(tarpaulin_include))]
 mod tests {
     use super::*;
+
+    struct ReadErrorHumbleUsbDevice;
+
+    impl HumbleUsbDevice for ReadErrorHumbleUsbDevice {
+        fn has_attached_kernel_driver(&self) -> bool {
+            true
+        }
+        fn detach_kernel_driver(&mut self) -> Result<(), Error> {
+            Ok(())
+        }
+        fn attach_kernel_driver(&mut self) -> Result<(), Error> {
+            Ok(())
+        }
+        fn read(&self, buffer: &mut [u8]) -> Result<(), Error> {
+            Err(Error::InvalidData)
+        }
+        fn claim_interface(&mut self) -> Result<(), Error> {
+            Ok(())
+        }
+        fn release_interface(&mut self) -> Result<(), Error> {
+            Ok(())
+        }
+        fn set_active_configuration(&mut self) -> Result<(), Error> {
+            Ok(())
+        }
+        fn set_alternate_setting(&mut self) -> Result<(), Error> {
+            Ok(())
+        }
+    }
+
+    struct DummyHumbleUsbDevice {
+        index: std::cell::UnsafeCell<usize>,
+        enter_happened: std::cell::UnsafeCell<bool>,
+        timeout_happened: std::cell::UnsafeCell<bool>,
+    }
+
+    impl HumbleUsbDevice for DummyHumbleUsbDevice {
+        fn has_attached_kernel_driver(&self) -> bool {
+            true
+        }
+        fn detach_kernel_driver(&mut self) -> Result<(), Error> {
+            Ok(())
+        }
+        fn attach_kernel_driver(&mut self) -> Result<(), Error> {
+            Ok(())
+        }
+        fn read(&self, buffer: &mut [u8]) -> Result<(), Error> {
+            unsafe {
+                let timeout_happened = *self.timeout_happened.get();
+                if timeout_happened {
+                    let index = *self.index.get();
+
+                    if index < 10 {
+                        buffer[2] = 30;
+
+                        let p_index = &mut *self.index.get();
+                        *p_index = index + 1;
+                    } else {
+                        let enter_happened = *self.enter_happened.get();
+                        if enter_happened {
+                            buffer[2] = 0;
+                        } else {
+                            buffer[2] = 40;
+
+                            let p_enter_happened = &mut *self.enter_happened.get();
+                            *p_enter_happened = true;
+                        }
+                    }
+                } else {
+                    let p_timeout_happened = &mut *self.timeout_happened.get();
+                    *p_timeout_happened = true;
+                    return Err(Error::Timeout);
+                }
+            }
+            Ok(())
+        }
+        fn claim_interface(&mut self) -> Result<(), Error> {
+            Ok(())
+        }
+        fn release_interface(&mut self) -> Result<(), Error> {
+            Ok(())
+        }
+        fn set_active_configuration(&mut self) -> Result<(), Error> {
+            Ok(())
+        }
+        fn set_alternate_setting(&mut self) -> Result<(), Error> {
+            Ok(())
+        }
+    }
 
     #[test]
     fn test_raw_data_interpretation() {
@@ -178,6 +245,10 @@ mod tests {
         let data: [u8; 3] = [1, 0, 40];
         let result = RawDataInterpretation::from(&data);
         assert_eq!(Ok(RawDataInterpretation::Enter), result);
+
+        let data: [u8; 3] = [1, 0, 124];
+        let result = RawDataInterpretation::from(&data);
+        assert_eq!(Err(Error::InvalidData), result);
     }
 
     #[test]
@@ -195,5 +266,36 @@ mod tests {
         let ignore_data = [1, 0, 0];
         interpreter.process(&ignore_data).unwrap();
         assert!(interpreter.finished_processing());
+    }
+
+    #[test]
+    fn test_usb_reader_read_error() {
+        let mut dummy_device = ReadErrorHumbleUsbDevice;
+        dummy_device.initialize().unwrap();
+        let mut usb_reader = NeuftechUsbReader::new(dummy_device).unwrap();
+        let result = usb_reader.read();
+        assert_eq!(Err(Error::InvalidData), result);
+    }
+
+    #[test]
+    fn test_usb_reader_successful_read() {
+        let dummy_device = DummyHumbleUsbDevice {
+            index: 0.into(),
+            enter_happened: false.into(),
+            timeout_happened: false.into(),
+        };
+        let mut usb_reader = NeuftechUsbReader::new(dummy_device).unwrap();
+        let result = usb_reader.read();
+
+        let expected_data: Vec<u8> = vec![30; 10];
+        assert_eq!(expected_data, result.unwrap().into_vec());
+    }
+
+    #[test]
+    fn test_debug() {
+        let mut dummy_device = ReadErrorHumbleUsbDevice;
+        dummy_device.initialize().unwrap();
+        let usb_reader = NeuftechUsbReader::new(dummy_device).unwrap();
+        assert_eq!("NeuftechUsbReader", format!("{:?}", usb_reader));
     }
 }

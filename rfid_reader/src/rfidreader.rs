@@ -1,7 +1,12 @@
+#![warn(missing_docs)]
+#![warn(missing_doc_code_examples)]
+#![forbid(unsafe_code)]
+
 use crate::error::Error;
 use crate::id::{ProductId, VendorId};
 use crate::keymap::{Key, KeyMap};
-use crate::neuftech::{NeuftechKeyMap, NeuftechUsbReader};
+use crate::neuftech;
+use crate::neuftech::NeuftechKeyMap;
 use crate::usbreader::UsbReader;
 
 use std::time::Duration;
@@ -38,9 +43,8 @@ impl<K: KeyMap, U: UsbReader> RfidReader for GenericRfidReader<K, U> {
             let key = self.keymap.map(*raw_value);
             if key.is_ok() {
                 let key = key.unwrap();
-                match key {
-                    Key::Digit(c) => rfid_value.push(c),
-                    _ => (),
+                if let Key::Digit(c) = key {
+                    rfid_value.push(c)
                 }
             }
         }
@@ -48,17 +52,19 @@ impl<K: KeyMap, U: UsbReader> RfidReader for GenericRfidReader<K, U> {
     }
 }
 
+#[cfg(not(tarpaulin_include))]
 pub fn open(
     vendor_id: VendorId,
     product_id: ProductId,
     timeout: Duration,
 ) -> Result<impl RfidReader, Error> {
     let keymap = NeuftechKeyMap;
-    let usbreader = NeuftechUsbReader::open(vendor_id, product_id, timeout)?;
+    let usbreader = neuftech::open(vendor_id, product_id, timeout)?;
     Ok(GenericRfidReader::from(keymap, usbreader))
 }
 
 #[cfg(test)]
+#[cfg(not(tarpaulin_include))]
 mod tests {
     use super::*;
     use crate::keymap::Key;
@@ -69,6 +75,9 @@ mod tests {
         fn read(&self) -> Result<Box<[u8]>, Error> {
             let data = (0..10).collect::<Vec<u8>>().into_boxed_slice();
             Ok(data)
+        }
+        fn deinitialize(&mut self) -> Result<(), Error> {
+            Ok(())
         }
     }
 
@@ -97,8 +106,21 @@ mod tests {
     fn test_read() {
         let usb_reader = MockUsbReader;
         let key_map = MockKeyMap;
-        let rfid_reader = GenericRfidReader::from(key_map, usb_reader);
+        let mut rfid_reader = GenericRfidReader::from(key_map, usb_reader);
         let rfid = rfid_reader.read().unwrap();
         assert_eq!("0123456789", rfid);
+        assert_eq!("MockKeyMap", format!("{:?}", rfid_reader.keymap));
+        assert_eq!(Ok(()), rfid_reader.usbreader.deinitialize());
+    }
+
+    #[test]
+    fn test_debug() {
+        let usb_reader = MockUsbReader;
+        let key_map = MockKeyMap;
+        let rfid_reader = GenericRfidReader::from(key_map, usb_reader);
+        assert_eq!(
+            "GenericRfidReader { keymap: MockKeyMap, usbreader: MockUsbReader }",
+            format!("{:?}", rfid_reader)
+        );
     }
 }

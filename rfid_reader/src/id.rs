@@ -1,3 +1,7 @@
+#![warn(missing_docs)]
+#![warn(missing_doc_code_examples)]
+#![forbid(unsafe_code)]
+
 use std::fmt;
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct VendorId(u16);
@@ -46,6 +50,7 @@ implement_display_trait!(VendorId);
 implement_display_trait!(ProductId);
 
 #[cfg(test)]
+#[cfg(not(tarpaulin_include))]
 mod tests {
     use super::*;
 

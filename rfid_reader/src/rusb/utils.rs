@@ -1,6 +1,10 @@
+#![warn(missing_docs)]
+#![warn(missing_doc_code_examples)]
+#![forbid(unsafe_code)]
+
 use crate::error::Error;
 use crate::id::{ProductId, VendorId};
-use rusb::{Context, Device, DeviceDescriptor, DeviceHandle, Direction, TransferType, UsbContext};
+use rusb::{Device, DeviceDescriptor, Direction, TransferType, UsbContext};
 
 #[derive(Debug, PartialEq)]
 pub(crate) struct EndPoint {
@@ -12,7 +16,7 @@ pub(crate) struct EndPoint {
 
 impl EndPoint {
     pub(crate) fn get_interface(&self) -> u8 {
-        self.config
+        self.interface
     }
     pub(crate) fn get_address(&self) -> u8 {
         self.address
@@ -21,18 +25,8 @@ impl EndPoint {
         self.config
     }
     pub(crate) fn get_setting(&self) -> u8 {
-        self.config
+        self.setting
     }
-}
-
-pub(crate) fn configure_device_handle<T: UsbContext>(
-    device_handle: &mut DeviceHandle<T>,
-    end_point: &EndPoint,
-) -> Result<(), Error> {
-    device_handle.set_active_configuration(end_point.config)?;
-    device_handle.claim_interface(end_point.interface)?;
-    device_handle.set_alternate_setting(end_point.interface, end_point.setting)?;
-    Ok(())
 }
 
 pub(crate) fn get_device<T: UsbContext>(
@@ -52,9 +46,10 @@ pub(crate) fn get_device<T: UsbContext>(
     Err(Error::DeviceNotFound(vendor_id, product_id))
 }
 
-pub(crate) fn get_readable_interrupt_endpoint<T: UsbContext>(
+pub(crate) fn get_readable_endpoint<T: UsbContext>(
     device: &Device<T>,
     device_descriptor: &DeviceDescriptor,
+    transfer_type: TransferType,
 ) -> Result<EndPoint, Error> {
     for n in 0..device_descriptor.num_configurations() {
         let config_description = match device.config_descriptor(n) {
@@ -65,7 +60,7 @@ pub(crate) fn get_readable_interrupt_endpoint<T: UsbContext>(
             for interface_description in interface.descriptors() {
                 for endpoint_descriptor in interface_description.endpoint_descriptors() {
                     if endpoint_descriptor.direction() == Direction::In
-                        && endpoint_descriptor.transfer_type() == TransferType::Interrupt
+                        && endpoint_descriptor.transfer_type() == transfer_type
                     {
                         return Ok(EndPoint {
                             config: config_description.number(),
@@ -78,33 +73,38 @@ pub(crate) fn get_readable_interrupt_endpoint<T: UsbContext>(
             }
         }
     }
-    Err(Error::ReadableInterruptEndPointNotFound(
+    Err(Error::ReadableEndPointNotFound(
         device_descriptor.vendor_id().into(),
         device_descriptor.product_id().into(),
     ))
 }
 
 #[cfg(test)]
+#[cfg(not(tarpaulin_include))]
 mod tests {
     use super::*;
     #[test]
     fn test_get_device_not_found() {
-        let context = Context::new().unwrap();
+        let context = rusb::Context::new().unwrap();
         let device = get_device(&context, VendorId::from(0), ProductId::from(0));
         assert!(device.is_err());
     }
 
     #[test]
     fn test_get_device() {
-        let context = Context::new().unwrap();
-        let device = get_device(&context, VendorId::from(0x0cf3), ProductId::from(0x3005));
+        // readable device in my system, change these two values in your system
+        let vendor_id = VendorId::from(0x0cf3);
+        let product_id = ProductId::from(0x3005);
+
+        let context = rusb::Context::new().unwrap();
+        let device = get_device(&context, vendor_id, product_id);
 
         assert!(device.is_ok());
     }
 
     #[test]
     fn test_get_readable_endpoint() {
-        let context = Context::new().unwrap();
+        let context = rusb::Context::new().unwrap();
 
         // readable device in my system, change these two values in your system
         let vendor_id = VendorId::from(0x0cf3);
@@ -112,7 +112,7 @@ mod tests {
         let result = get_device(&context, vendor_id, product_id);
         assert!(result.is_ok());
         let (device, device_descriptor) = result.unwrap();
-        let endpoint = get_readable_interrupt_endpoint(&device, &device_descriptor);
+        let endpoint = get_readable_endpoint(&device, &device_descriptor, TransferType::Interrupt);
         assert!(endpoint.is_ok());
         assert_eq!(
             EndPoint {
@@ -123,5 +123,36 @@ mod tests {
             },
             endpoint.unwrap()
         );
+    }
+
+    #[test]
+    fn test_get_no_readable_endpoint() {
+        let context = rusb::Context::new().unwrap();
+
+        // device in my system without readable bulk endpoint, change these two values in your system
+        let vendor_id = VendorId::from(0x058f);
+        let product_id = ProductId::from(0xa004);
+        let result = get_device(&context, vendor_id, product_id);
+        assert!(result.is_ok());
+        let (device, device_descriptor) = result.unwrap();
+        let endpoint = get_readable_endpoint(&device, &device_descriptor, TransferType::Bulk);
+        assert_eq!(
+            Err(Error::ReadableEndPointNotFound(vendor_id, product_id)),
+            endpoint
+        );
+    }
+
+    #[test]
+    fn test_endpoint() {
+        let endpoint = EndPoint {
+            config: 0,
+            interface: 1,
+            setting: 2,
+            address: 3,
+        };
+        assert_eq!(0, endpoint.get_config());
+        assert_eq!(1, endpoint.get_interface());
+        assert_eq!(2, endpoint.get_setting());
+        assert_eq!(3, endpoint.get_address());
     }
 }

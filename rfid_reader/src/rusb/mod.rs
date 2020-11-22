@@ -1,4 +1,8 @@
+#![warn(missing_docs)]
+#![warn(missing_doc_code_examples)]
+#![forbid(unsafe_code)]
+
 mod rusbhumbleusbdevice;
-pub(crate) mod utils;
+mod utils;
 
 pub(crate) use rusbhumbleusbdevice::open;
