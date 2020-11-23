@@ -32,12 +32,6 @@ impl<T: HumbleUsbDevice> NeuftechUsbReader<T> {
     }
 }
 
-impl<T: HumbleUsbDevice> Drop for NeuftechUsbReader<T> {
-    fn drop(&mut self) {
-        self.deinitialize().unwrap();
-    }
-}
-
 impl<T: HumbleUsbDevice> UsbReader for NeuftechUsbReader<T> {
     fn read(&self) -> Result<Box<[u8]>, Error> {
         let mut raw_data_interpreter = RawDataInterpreter::default();
@@ -133,11 +127,13 @@ impl RawDataInterpreter {
 mod tests {
     use super::*;
 
-    struct ReadErrorHumbleUsbDevice;
+    struct ReadErrorHumbleUsbDevice {
+        deinitialized: bool,
+    }
 
     impl HumbleUsbDevice for ReadErrorHumbleUsbDevice {
-        fn has_attached_kernel_driver(&self) -> bool {
-            true
+        fn has_attached_kernel_driver(&self) -> Result<bool, Error> {
+            Ok(true)
         }
         fn detach_kernel_driver(&mut self) -> Result<(), Error> {
             Ok(())
@@ -159,6 +155,12 @@ mod tests {
         }
         fn set_alternate_setting(&mut self) -> Result<(), Error> {
             Ok(())
+        }
+        fn set_deinitialized(&mut self) {
+            self.deinitialized = true;
+        }
+        fn deinitialized(&self) -> bool {
+            self.deinitialized
         }
     }
 
@@ -200,7 +202,9 @@ mod tests {
 
     #[test]
     fn test_usb_reader_read_error() {
-        let mut dummy_device = ReadErrorHumbleUsbDevice;
+        let mut dummy_device = ReadErrorHumbleUsbDevice {
+            deinitialized: false,
+        };
         let mut usb_reader = new(dummy_device).unwrap();
         let result = usb_reader.read();
         assert_eq!(Err(Error::InvalidData), result);
@@ -208,7 +212,9 @@ mod tests {
 
     #[test]
     fn test_debug() {
-        let mut dummy_device = ReadErrorHumbleUsbDevice;
+        let mut dummy_device = ReadErrorHumbleUsbDevice {
+            deinitialized: false,
+        };
         dummy_device.initialize().unwrap();
         let usb_reader = NeuftechUsbReader::new(dummy_device).unwrap();
         assert_eq!("NeuftechUsbReader", format!("{:?}", usb_reader));

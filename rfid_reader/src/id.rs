@@ -4,8 +4,10 @@
 
 use std::fmt;
 #[derive(Debug, PartialEq, Clone, Copy)]
+/// Describes a Vendor Id of a USB device.
 pub struct VendorId(u16);
 #[derive(Debug, PartialEq, Clone, Copy)]
+/// Describes a Product Id of a USB device.
 pub struct ProductId(u16);
 
 pub trait Id {

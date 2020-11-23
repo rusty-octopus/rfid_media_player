@@ -14,14 +14,21 @@ use rusb::{Context, DeviceHandle, UsbContext};
 struct RusbHumbleUsbDevice<T: UsbContext> {
     device_handle: DeviceHandle<T>,
     endpoint: EndPoint,
-    attached_kernel_driver: bool,
     timeout: Duration,
+    deinitialized: bool,
 }
 
 impl<T: UsbContext> HumbleUsbDevice for RusbHumbleUsbDevice<T> {
     #[cfg(not(tarpaulin_include))]
-    fn has_attached_kernel_driver(&self) -> bool {
-        self.attached_kernel_driver
+    fn has_attached_kernel_driver(&self) -> Result<bool, Error> {
+        let result = self
+            .device_handle
+            .kernel_driver_active(self.endpoint.get_interface());
+        if result.is_ok() {
+            Ok(result.unwrap())
+        } else {
+            Err(result.unwrap_err().into())
+        }
     }
     #[cfg(not(tarpaulin_include))]
     fn detach_kernel_driver(&mut self) -> Result<(), Error> {
@@ -65,6 +72,20 @@ impl<T: UsbContext> HumbleUsbDevice for RusbHumbleUsbDevice<T> {
             .set_alternate_setting(self.endpoint.get_interface(), self.endpoint.get_setting())?;
         Ok(())
     }
+    #[cfg(not(tarpaulin_include))]
+    fn set_deinitialized(&mut self) {
+        self.deinitialized = false;
+    }
+    #[cfg(not(tarpaulin_include))]
+    fn deinitialized(&self) -> bool {
+        self.deinitialized
+    }
+}
+
+impl<T: UsbContext> Drop for RusbHumbleUsbDevice<T> {
+    fn drop(&mut self) {
+        self.deinitialize().unwrap();
+    }
 }
 
 #[cfg(not(tarpaulin_include))]
@@ -78,11 +99,10 @@ pub(crate) fn open(
     let endpoint =
         get_readable_endpoint(&device, &device_descriptor, rusb::TransferType::Interrupt)?;
     let device_handle = device.open()?;
-    let attached_kernel_driver = device_handle.kernel_driver_active(endpoint.get_interface())?;
     Ok(RusbHumbleUsbDevice {
         device_handle,
         endpoint,
-        attached_kernel_driver,
         timeout,
+        deinitialized: false,
     })
 }

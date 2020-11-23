@@ -1,9 +1,18 @@
 # Readme
 
+## Todos
+
+1. Rfid Reader
+2. Tracks
+3. Media Player
+4. Cli Application
+5. Cross Compile
+
 ## Links
 
 * [Compile Rust for Raspberry Pi ARM](https://medium.com/swlh/compiling-rust-for-raspberry-pi-arm-922b55dbb050)
 * [Cli Handbook](https://rust-cli.github.io/book/index.html)
+    * [Signal handling](https://rust-cli.github.io/book/in-depth/signals.html)
 
 ## Useful crates
 
@@ -21,13 +30,22 @@
 component application
 component media_player
 component rfid_reader
-component data_base
+component tracks
 component file #Crimson
+component ctrlc #LightGrey
+component rusb #LightGrey
+component rodio #LightGrey
+component serde #LightGrey
 
 application -down-> rfid_reader
-application -down-> data_base
 application -down-> media_player
 application -down-> file
+application -down-> ctrlc
+application -down-> tracks
+media_player -down-> rodio
+rfid_reader -down-> rusb
+tracks -down-> serde
+
 ```
 
 ### Sequence
