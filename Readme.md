@@ -3,6 +3,7 @@
 ## Links
 
 * [Compile Rust for Raspberry Pi ARM](https://medium.com/swlh/compiling-rust-for-raspberry-pi-arm-922b55dbb050)
+* [Cli Handbook](https://rust-cli.github.io/book/index.html)
 
 ## Useful crates
 

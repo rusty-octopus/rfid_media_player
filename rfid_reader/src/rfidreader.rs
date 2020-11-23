@@ -3,16 +3,12 @@
 #![forbid(unsafe_code)]
 
 use crate::error::Error;
-use crate::id::{ProductId, VendorId};
 use crate::keymap::{Key, KeyMap};
-use crate::neuftech;
-use crate::neuftech::NeuftechKeyMap;
 use crate::usbreader::UsbReader;
-
-use std::time::Duration;
 
 pub trait RfidReader: std::fmt::Debug {
     fn read(&self) -> Result<String, Error>;
+    fn deinitialize(&mut self) -> Result<(), Error>;
 }
 
 struct GenericRfidReader<K: KeyMap, U: UsbReader> {
@@ -50,17 +46,13 @@ impl<K: KeyMap, U: UsbReader> RfidReader for GenericRfidReader<K, U> {
         }
         Ok(rfid_value)
     }
+    fn deinitialize(&mut self) -> Result<(), Error> {
+        self.usbreader.deinitialize()
+    }
 }
 
-#[cfg(not(tarpaulin_include))]
-pub fn open(
-    vendor_id: VendorId,
-    product_id: ProductId,
-    timeout: Duration,
-) -> Result<impl RfidReader, Error> {
-    let keymap = NeuftechKeyMap;
-    let usbreader = neuftech::open(vendor_id, product_id, timeout)?;
-    Ok(GenericRfidReader::from(keymap, usbreader))
+pub(crate) fn new<K: KeyMap, U: UsbReader>(key_map: K, usb_reader: U) -> impl RfidReader {
+    GenericRfidReader::from(key_map, usb_reader)
 }
 
 #[cfg(test)]
@@ -106,11 +98,10 @@ mod tests {
     fn test_read() {
         let usb_reader = MockUsbReader;
         let key_map = MockKeyMap;
-        let mut rfid_reader = GenericRfidReader::from(key_map, usb_reader);
+        let mut rfid_reader = new(key_map, usb_reader);
         let rfid = rfid_reader.read().unwrap();
         assert_eq!("0123456789", rfid);
-        assert_eq!("MockKeyMap", format!("{:?}", rfid_reader.keymap));
-        assert_eq!(Ok(()), rfid_reader.usbreader.deinitialize());
+        assert_eq!(Ok(()), rfid_reader.deinitialize());
     }
 
     #[test]
@@ -118,6 +109,7 @@ mod tests {
         let usb_reader = MockUsbReader;
         let key_map = MockKeyMap;
         let rfid_reader = GenericRfidReader::from(key_map, usb_reader);
+        assert_eq!("MockKeyMap", format!("{:?}", rfid_reader.keymap));
         assert_eq!(
             "GenericRfidReader { keymap: MockKeyMap, usbreader: MockUsbReader }",
             format!("{:?}", rfid_reader)

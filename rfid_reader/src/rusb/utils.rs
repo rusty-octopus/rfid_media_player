@@ -79,6 +79,16 @@ pub(crate) fn get_readable_endpoint<T: UsbContext>(
     ))
 }
 
+impl From<rusb::Error> for Error {
+    fn from(error: rusb::Error) -> Self {
+        match error {
+            rusb::Error::Timeout => Error::Timeout,
+            rusb::Error::Access => Error::Access,
+            _ => Error::OtherUsbError(error.to_string()),
+        }
+    }
+}
+
 #[cfg(test)]
 #[cfg(not(tarpaulin_include))]
 mod tests {
@@ -154,5 +164,21 @@ mod tests {
         assert_eq!(1, endpoint.get_interface());
         assert_eq!(2, endpoint.get_setting());
         assert_eq!(3, endpoint.get_address());
+    }
+
+    #[test]
+    fn test_from_rusb_error() {
+        let rusb_error = rusb::Error::Io;
+        let error = Error::from(rusb_error);
+        assert_eq!(
+            Error::OtherUsbError(String::from("Input/Output Error")),
+            error
+        );
+        let rusb_error = rusb::Error::Timeout;
+        let error = Error::from(rusb_error);
+        assert_eq!(Error::Timeout, error);
+        let rusb_error = rusb::Error::Access;
+        let error = Error::from(rusb_error);
+        assert_eq!(Error::Access, error);
     }
 }

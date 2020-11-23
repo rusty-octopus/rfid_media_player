@@ -4,12 +4,8 @@
 
 use crate::error::Error;
 use crate::humbleusbdevice::HumbleUsbDevice;
-use crate::id::{ProductId, VendorId};
-use crate::rusb;
 
 use crate::usbreader::UsbReader;
-
-use std::time::Duration;
 
 pub(crate) struct NeuftechUsbReader<T>
 where
@@ -24,14 +20,8 @@ impl<T: HumbleUsbDevice> std::fmt::Debug for NeuftechUsbReader<T> {
     }
 }
 
-#[cfg(not(tarpaulin_include))]
-pub(crate) fn open(
-    vendor_id: VendorId,
-    product_id: ProductId,
-    timeout: Duration,
-) -> Result<impl UsbReader, Error> {
-    let usb_device = rusb::open(vendor_id, product_id, timeout)?;
-    NeuftechUsbReader::new(usb_device)
+pub(crate) fn new<T: HumbleUsbDevice>(humble_usb_device: T) -> Result<impl UsbReader, Error> {
+    NeuftechUsbReader::new(humble_usb_device)
 }
 
 impl<T: HumbleUsbDevice> NeuftechUsbReader<T> {
@@ -172,66 +162,6 @@ mod tests {
         }
     }
 
-    struct DummyHumbleUsbDevice {
-        index: std::cell::UnsafeCell<usize>,
-        enter_happened: std::cell::UnsafeCell<bool>,
-        timeout_happened: std::cell::UnsafeCell<bool>,
-    }
-
-    impl HumbleUsbDevice for DummyHumbleUsbDevice {
-        fn has_attached_kernel_driver(&self) -> bool {
-            true
-        }
-        fn detach_kernel_driver(&mut self) -> Result<(), Error> {
-            Ok(())
-        }
-        fn attach_kernel_driver(&mut self) -> Result<(), Error> {
-            Ok(())
-        }
-        fn read(&self, buffer: &mut [u8]) -> Result<(), Error> {
-            unsafe {
-                let timeout_happened = *self.timeout_happened.get();
-                if timeout_happened {
-                    let index = *self.index.get();
-
-                    if index < 10 {
-                        buffer[2] = 30;
-
-                        let p_index = &mut *self.index.get();
-                        *p_index = index + 1;
-                    } else {
-                        let enter_happened = *self.enter_happened.get();
-                        if enter_happened {
-                            buffer[2] = 0;
-                        } else {
-                            buffer[2] = 40;
-
-                            let p_enter_happened = &mut *self.enter_happened.get();
-                            *p_enter_happened = true;
-                        }
-                    }
-                } else {
-                    let p_timeout_happened = &mut *self.timeout_happened.get();
-                    *p_timeout_happened = true;
-                    return Err(Error::Timeout);
-                }
-            }
-            Ok(())
-        }
-        fn claim_interface(&mut self) -> Result<(), Error> {
-            Ok(())
-        }
-        fn release_interface(&mut self) -> Result<(), Error> {
-            Ok(())
-        }
-        fn set_active_configuration(&mut self) -> Result<(), Error> {
-            Ok(())
-        }
-        fn set_alternate_setting(&mut self) -> Result<(), Error> {
-            Ok(())
-        }
-    }
-
     #[test]
     fn test_raw_data_interpretation() {
         let data: [u8; 1] = [0];
@@ -271,24 +201,9 @@ mod tests {
     #[test]
     fn test_usb_reader_read_error() {
         let mut dummy_device = ReadErrorHumbleUsbDevice;
-        dummy_device.initialize().unwrap();
-        let mut usb_reader = NeuftechUsbReader::new(dummy_device).unwrap();
+        let mut usb_reader = new(dummy_device).unwrap();
         let result = usb_reader.read();
         assert_eq!(Err(Error::InvalidData), result);
-    }
-
-    #[test]
-    fn test_usb_reader_successful_read() {
-        let dummy_device = DummyHumbleUsbDevice {
-            index: 0.into(),
-            enter_happened: false.into(),
-            timeout_happened: false.into(),
-        };
-        let mut usb_reader = NeuftechUsbReader::new(dummy_device).unwrap();
-        let result = usb_reader.read();
-
-        let expected_data: Vec<u8> = vec![30; 10];
-        assert_eq!(expected_data, result.unwrap().into_vec());
     }
 
     #[test]
@@ -298,4 +213,78 @@ mod tests {
         let usb_reader = NeuftechUsbReader::new(dummy_device).unwrap();
         assert_eq!("NeuftechUsbReader", format!("{:?}", usb_reader));
     }
+
+    // struct DummyHumbleUsbDevice {
+    //     index: std::cell::UnsafeCell<usize>,
+    //     enter_happened: std::cell::UnsafeCell<bool>,
+    //     timeout_happened: std::cell::UnsafeCell<bool>,
+    // }
+
+    // impl HumbleUsbDevice for DummyHumbleUsbDevice {
+    //     fn has_attached_kernel_driver(&self) -> bool {
+    //         true
+    //     }
+    //     fn detach_kernel_driver(&mut self) -> Result<(), Error> {
+    //         Ok(())
+    //     }
+    //     fn attach_kernel_driver(&mut self) -> Result<(), Error> {
+    //         Ok(())
+    //     }
+    //     fn read(&self, buffer: &mut [u8]) -> Result<(), Error> {
+    //         unsafe {
+    //             let timeout_happened = *self.timeout_happened.get();
+    //             if timeout_happened {
+    //                 let index = *self.index.get();
+
+    //                 if index < 10 {
+    //                     buffer[2] = 30;
+
+    //                     let p_index = &mut *self.index.get();
+    //                     *p_index = index + 1;
+    //                 } else {
+    //                     let enter_happened = *self.enter_happened.get();
+    //                     if enter_happened {
+    //                         buffer[2] = 0;
+    //                     } else {
+    //                         buffer[2] = 40;
+
+    //                         let p_enter_happened = &mut *self.enter_happened.get();
+    //                         *p_enter_happened = true;
+    //                     }
+    //                 }
+    //             } else {
+    //                 let p_timeout_happened = &mut *self.timeout_happened.get();
+    //                 *p_timeout_happened = true;
+    //                 return Err(Error::Timeout);
+    //             }
+    //         }
+    //         Ok(())
+    //     }
+    //     fn claim_interface(&mut self) -> Result<(), Error> {
+    //         Ok(())
+    //     }
+    //     fn release_interface(&mut self) -> Result<(), Error> {
+    //         Ok(())
+    //     }
+    //     fn set_active_configuration(&mut self) -> Result<(), Error> {
+    //         Ok(())
+    //     }
+    //     fn set_alternate_setting(&mut self) -> Result<(), Error> {
+    //         Ok(())
+    //     }
+    // }
+
+    // #[test]
+    // fn test_usb_reader_successful_read() {
+    //     let dummy_device = DummyHumbleUsbDevice {
+    //         index: 0.into(),
+    //         enter_happened: false.into(),
+    //         timeout_happened: false.into(),
+    //     };
+    //     let mut usb_reader = NeuftechUsbReader::new(dummy_device).unwrap();
+    //     let result = usb_reader.read();
+
+    //     let expected_data: Vec<u8> = vec![30; 10];
+    //     assert_eq!(expected_data, result.unwrap().into_vec());
+    // }
 }

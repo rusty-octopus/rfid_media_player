@@ -3,7 +3,6 @@
 #![forbid(unsafe_code)]
 
 use crate::id::{ProductId, VendorId};
-use rusb;
 #[derive(Debug, PartialEq)]
 pub enum Error {
     DeviceNotFound(VendorId, ProductId),
@@ -24,16 +23,6 @@ impl std::fmt::Display for Error {
     }
 }
 
-impl From<rusb::Error> for Error {
-    fn from(error: rusb::Error) -> Self {
-        match error {
-            rusb::Error::Timeout => Self::Timeout,
-            rusb::Error::Access => Self::Access,
-            _ => Self::OtherUsbError(error.to_string()),
-        }
-    }
-}
-
 #[cfg(test)]
 #[cfg(not(tarpaulin_include))]
 mod tests {
@@ -43,21 +32,5 @@ mod tests {
     fn test_display() {
         let error = Error::Timeout;
         assert_eq!("Timeout", format!("{}", error));
-    }
-
-    #[test]
-    fn test_from_rusb_error() {
-        let rusb_error = rusb::Error::Io;
-        let error = Error::from(rusb_error);
-        assert_eq!(
-            Error::OtherUsbError(String::from("Input/Output Error")),
-            error
-        );
-        let rusb_error = rusb::Error::Timeout;
-        let error = Error::from(rusb_error);
-        assert_eq!(Error::Timeout, error);
-        let rusb_error = rusb::Error::Access;
-        let error = Error::from(rusb_error);
-        assert_eq!(Error::Access, error);
     }
 }
