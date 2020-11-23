@@ -208,6 +208,7 @@ mod tests {
         let mut usb_reader = new(dummy_device).unwrap();
         let result = usb_reader.read();
         assert_eq!(Err(Error::InvalidData), result);
+        usb_reader.deinitialize().unwrap();
     }
 
     #[test]
@@ -216,8 +217,9 @@ mod tests {
             deinitialized: false,
         };
         dummy_device.initialize().unwrap();
-        let usb_reader = NeuftechUsbReader::new(dummy_device).unwrap();
+        let mut usb_reader = NeuftechUsbReader::new(dummy_device).unwrap();
         assert_eq!("NeuftechUsbReader", format!("{:?}", usb_reader));
+        usb_reader.deinitialize().unwrap();
     }
 
     // struct DummyHumbleUsbDevice {

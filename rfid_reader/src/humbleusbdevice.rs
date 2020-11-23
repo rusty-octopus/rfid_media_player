@@ -25,7 +25,7 @@ pub trait HumbleUsbDevice {
     fn set_deinitialized(&mut self);
     fn deinitialized(&self) -> bool;
     fn deinitialize(&mut self) -> Result<(), Error> {
-        if self.deinitialized() {
+        if !self.deinitialized() {
             self.set_deinitialized();
             if self.has_attached_kernel_driver()? {
                 self.attach_kernel_driver()?;

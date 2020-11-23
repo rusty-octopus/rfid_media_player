@@ -83,6 +83,7 @@ impl<T: UsbContext> HumbleUsbDevice for RusbHumbleUsbDevice<T> {
 }
 
 impl<T: UsbContext> Drop for RusbHumbleUsbDevice<T> {
+    #[cfg(not(tarpaulin_include))]
     fn drop(&mut self) {
         self.deinitialize().unwrap();
     }
