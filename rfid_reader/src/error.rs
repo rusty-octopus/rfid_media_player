@@ -3,15 +3,44 @@
 #![forbid(unsafe_code)]
 
 use crate::id::{ProductId, VendorId};
+/// RFID Reader errors.
+///
+/// Defines all runtime errors.
 #[derive(Debug, PartialEq)]
 pub enum Error {
+    /// Device Not Found.
+    ///
+    /// Returned whenever the device defined by [VendorId](crate::VendorId) and [ProductId](crate::ProductId).
     DeviceNotFound(VendorId, ProductId),
+    /// Timeout error.
+    ///
+    /// The read returned a timeout. Mostly used internally.
     Timeout,
+    /// Access.
+    ///
+    /// Access to Device denied. This usually happens when the user rights are not sufficient.
+    /// Try using the RFID reader with more privileges.
     Access,
+    /// Readable Endpoint Not Found.
+    ///
+    /// Returned whenever no readable endpoint could be found for the device defined by [VendorId](crate::VendorId) and [ProductId](crate::ProductId).
     ReadableEndPointNotFound(VendorId, ProductId),
-    InvalidData,
-    TooFewReceivedData,
+    /// Invalid Data.
+    ///
+    /// Returned whenever invalid (or unexpected) data is received.
+    InvalidData(u8),
+    /// Too Few Received Data.
+    ///
+    /// Returned whenever too few bytes were received.
+    TooFewReceivedData(usize),
+    /// Key Not Existing.
+    ///
+    /// Returned whenever a byte value cannot be mapped to a key.
     KeyNotExisting(u8),
+    /// Other Usb Error.
+    ///
+    /// Returned whenever an other error from the used USB library
+    /// that is of minor importance for the RFID reader is returned.
     OtherUsbError(String),
 }
 

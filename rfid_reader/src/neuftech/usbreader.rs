@@ -71,11 +71,11 @@ impl RawDataInterpretation {
                 0 => Ok(Self::Repeated),
                 30..=39 => Ok(Self::Value(value)),
                 40 => Ok(Self::Enter),
-                _ => Err(Error::InvalidData),
+                _ => Err(Error::InvalidData(value)),
             };
             return return_value;
         }
-        Err(Error::TooFewReceivedData)
+        Err(Error::TooFewReceivedData(data.len()))
     }
 }
 
@@ -142,7 +142,7 @@ mod tests {
             Ok(())
         }
         fn read(&self, buffer: &mut [u8]) -> Result<(), Error> {
-            Err(Error::InvalidData)
+            Err(Error::InvalidData(0))
         }
         fn claim_interface(&mut self) -> Result<(), Error> {
             Ok(())
@@ -168,7 +168,7 @@ mod tests {
     fn test_raw_data_interpretation() {
         let data: [u8; 1] = [0];
         let result = RawDataInterpretation::from(&data);
-        assert_eq!(Err(Error::TooFewReceivedData), result);
+        assert_eq!(Err(Error::TooFewReceivedData(1)), result);
 
         let data: [u8; 3] = [1, 0, 39];
         let result = RawDataInterpretation::from(&data);
@@ -180,7 +180,7 @@ mod tests {
 
         let data: [u8; 3] = [1, 0, 124];
         let result = RawDataInterpretation::from(&data);
-        assert_eq!(Err(Error::InvalidData), result);
+        assert_eq!(Err(Error::InvalidData(124)), result);
     }
 
     #[test]
@@ -207,7 +207,7 @@ mod tests {
         };
         let mut usb_reader = new(dummy_device).unwrap();
         let result = usb_reader.read();
-        assert_eq!(Err(Error::InvalidData), result);
+        assert_eq!(Err(Error::InvalidData(0)), result);
         usb_reader.deinitialize().unwrap();
     }
 
