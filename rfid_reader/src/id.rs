@@ -10,10 +10,6 @@ pub struct VendorId(u16);
 /// Describes a Product Id of a USB device.
 pub struct ProductId(u16);
 
-pub trait Id {
-    fn new(id: u16) -> Self;
-}
-
 macro_rules! implement_from_trait {
     ($id_type:tt) => {
         impl From<u16> for $id_type {
