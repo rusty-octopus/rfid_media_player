@@ -1,8 +1,15 @@
 [package]
 name = "track_store"
-version = "0.1.0"
+version = "1.0.0"
 authors = ["rusty-octopus <rustyoctopus@posteo.org>"]
 edition = "2018"
+license = "MIT"
+readme = "Readme.md"
+description = "Crate for a track store that enables getting the path of a track by its id."
+repository = ""
+homepage = ""
+categories = [""]
+keywords = ["yaml"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

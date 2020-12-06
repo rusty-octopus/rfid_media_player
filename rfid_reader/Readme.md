@@ -9,7 +9,7 @@ Add dependency to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-rfid_reader = "1.0.7"
+rfid_reader = "1.0.0"
 ```
 
 Then use rfid_reader the following way:

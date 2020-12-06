@@ -4,6 +4,9 @@
 
 use serde::{Deserialize, Serialize};
 
+/// The path of a track.
+///
+/// The [`TrackPath`](crate::TrackPath) is created from a [`String`](std::string::String) and contains the path to the track.
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct TrackPath(String);
 

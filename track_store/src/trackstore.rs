@@ -8,10 +8,20 @@ use crate::trackpath::TrackPath;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+/// The [`TrackStore`](crate::TrackStore) trait.
+///
+/// Enables to get the [`TrackPath`](crate::TrackPath) of a track if there is a path found for the
+/// given [`Id`](crate::Id).
 pub trait TrackStore {
+    /// Get the [`TrackPath`](crate::TrackPath) for the supplied [`Id`](crate::Id) or [`None`](std::option::Option::None)
+    /// if there is no path for the supplied id.
     fn get_path(&self, id: &Id) -> Option<&TrackPath>;
 }
 
+/// Load a [`TrackStore`](crate::TrackStore) from the supplied yaml [String](std::string::String).
+///
+/// Returns a [`LoadError`](crate::Error::LoadError) if the store cannot be loaded. Most likely the yaml string is
+/// ill-formed.
 pub fn load(yaml_string: &str) -> Result<impl TrackStore, Error> {
     let track_store_result: serde_yaml::Result<TrackStoreImplementation> =
         serde_yaml::from_str(yaml_string);

@@ -1,8 +1,16 @@
 #![warn(missing_docs)]
 #![warn(missing_doc_code_examples)]
 #![forbid(unsafe_code)]
+
+/// Track store errors errors.
+///
+/// Defines all runtime errors.
 #[derive(Debug, PartialEq)]
 pub enum Error {
+    /// Load error.
+    ///
+    /// Returned when [`load`](crate::load)ing the [`TrackStore`](crate::TrackStore) did not work,
+    /// e.g. when the parsed yaml string is invalid.
     LoadError(String),
 }
 
