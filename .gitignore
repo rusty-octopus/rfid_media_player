@@ -1,3 +1,4 @@
 target/
 *.pcapng
 *.gnumeric
+media_player_test/sound.flac
