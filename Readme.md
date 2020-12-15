@@ -2,25 +2,24 @@
 
 ## Todos
 
-1. Rfid Reader
-2. Tracks
-3. Media Player
-4. Cli Application
-5. Cross Compile
+1. Media Player
+2. Cli Application
+3. Cross Compile
 
 ## Links
 
 * [Compile Rust for Raspberry Pi ARM](https://medium.com/swlh/compiling-rust-for-raspberry-pi-arm-922b55dbb050)
 * [Cli Handbook](https://rust-cli.github.io/book/index.html)
-    * [Signal handling](https://rust-cli.github.io/book/in-depth/signals.html)
+  * [Signal handling](https://rust-cli.github.io/book/in-depth/signals.html)
+* [Cross compile RaspPI](https://chacin.dev/blog/cross-compiling-rust-for-the-raspberry-pi/)
+* [RaspPI OS tutorial](https://github.com/rust-embedded/rust-raspberrypi-OS-tutorials)
+* [USB keyboard codes](https://www.win.tue.nl/~aeb/linux/kbd/scancodes-14.html)
+* [cross](https://crates.io/crates/cross)
 
 ## Useful crates
 
 * [rodio](https://docs.rs/rodio/0.12.0/rodio/)
   * [Sink](https://docs.rs/rodio/0.12.0/rodio/struct.Sink.html)
-* [Cross compile RaspPI](https://chacin.dev/blog/cross-compiling-rust-for-the-raspberry-pi/)
-* [RaspPI OS tutorial](https://github.com/rust-embedded/rust-raspberrypi-OS-tutorials)
-* [USB keyboard codes](https://www.win.tue.nl/~aeb/linux/kbd/scancodes-14.html)
 
 ## Architecture
 

@@ -15,3 +15,9 @@ impl From<String> for TrackPath {
         TrackPath(s)
     }
 }
+
+impl From<&str> for TrackPath {
+    fn from(path: &str) -> Self {
+        TrackPath(path.into())
+    }
+}

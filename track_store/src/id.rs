@@ -15,3 +15,9 @@ impl From<String> for Id {
         Id(s)
     }
 }
+
+impl From<&str> for Id {
+    fn from(path: &str) -> Self {
+        Id(path.into())
+    }
+}

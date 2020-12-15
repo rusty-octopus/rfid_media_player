@@ -4,3 +4,4 @@ mod track;
 
 pub use error::Error;
 pub use mediaplayer::{open, MediaPlayer};
+pub use track::Track;
