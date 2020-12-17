@@ -49,12 +49,10 @@ mod tests {
     #[test]
     fn test_serialize() {
         let mut map = HashMap::new();
-        let id = Id::from(String::from("1234"));
-        let path = TrackPath::from("path/to/track".to_string());
+        let id = Id::from("1234");
+        let path = TrackPath::from("path/to/track");
         map.insert(id, path);
-        // let id = Id::from(String::from("4321"));
-        // let path = TrackPath::from("path/to/track_2".to_string());
-        // map.insert(id, path);
+
         let track_store = TrackStoreImplementation(map);
         let yaml = serde_yaml::to_string(&track_store).unwrap();
         let expected_string = "---
@@ -67,10 +65,10 @@ mod tests {
         let yaml = "1234: path/to/track
 4321: path/to/track_2";
         let track_store = load(yaml).unwrap();
-        let id = String::from("1234").into();
+        let id = "1234".into();
         let track_path = track_store.get_path(&id);
         assert!(track_path.is_some());
-        let expected_path = String::from("path/to/track").into();
+        let expected_path = "path/to/track".into();
         assert_eq!(Some(&expected_path), track_path);
 
         let id = String::from("4321").into();

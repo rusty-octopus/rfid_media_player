@@ -1,7 +1,12 @@
+mod audiolib;
 mod error;
 mod mediaplayer;
 mod track;
 
 pub use error::Error;
-pub use mediaplayer::{open, MediaPlayer};
+pub use mediaplayer::MediaPlayer;
 pub use track::Track;
+
+pub fn open() -> Result<impl MediaPlayer, Error> {
+    mediaplayer::open_dummy()
+}
