@@ -7,22 +7,23 @@ pub trait MediaPlayer {
 
 struct MediaPlayerImplementation<T: AudioLib> {
     last_track: Option<Track>,
-    audiolib: T,
+    audio_lib: T,
 }
 
 impl<T: AudioLib> MediaPlayer for MediaPlayerImplementation<T> {
     fn play(&mut self, track: &Track) -> Result<(), Error> {
         if let Some(last_track) = &self.last_track {
             if last_track != track {
-                self.audiolib.play(&track)?;
+                self.audio_lib.stop();
+                self.audio_lib.play(&track)?;
                 self.last_track = Some(track.clone());
             } else {
-                if !self.audiolib.is_playing() {
-                    self.audiolib.play(&track)?;
+                if !self.audio_lib.is_playing() {
+                    self.audio_lib.play(&track)?;
                 }
             }
         } else {
-            self.audiolib.play(&track)?;
+            self.audio_lib.play(&track)?;
             self.last_track = Some(track.clone());
         }
         Ok(())
@@ -30,10 +31,10 @@ impl<T: AudioLib> MediaPlayer for MediaPlayerImplementation<T> {
 }
 
 impl<T: AudioLib> MediaPlayerImplementation<T> {
-    fn from(audiolib: T) -> Result<Self, Error> {
+    fn from(audio_lib: T) -> Result<Self, Error> {
         Ok(MediaPlayerImplementation {
             last_track: None,
-            audiolib: audiolib,
+            audio_lib: audio_lib,
         })
     }
 }
@@ -49,8 +50,8 @@ impl AudioLib for DummyAudioLib {
     }
 }
 
-pub(crate) fn open<T: AudioLib>(audiolib: T) -> Result<impl MediaPlayer, Error> {
-    MediaPlayerImplementation::from(audiolib)
+pub(crate) fn open<T: AudioLib>(audio_lib: T) -> Result<impl MediaPlayer, Error> {
+    MediaPlayerImplementation::from(audio_lib)
 }
 
 pub(crate) fn open_dummy() -> Result<impl MediaPlayer, Error> {
