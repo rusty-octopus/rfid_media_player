@@ -3,6 +3,8 @@ mod error;
 mod mediaplayer;
 mod track;
 
+mod rodiolib;
+
 pub use error::Error;
 pub use mediaplayer::MediaPlayer;
 pub use track::Track;
