@@ -1,3 +1,4 @@
+extern crate rodio;
 use rodio::Decoder;
 use rodio::Sink;
 use rodio::Source;
@@ -78,7 +79,7 @@ fn do_play2() {
             stream_handle = stream_handle_new;
             println!("Started new sound");
         }
-        if counter == 17 {
+        if counter == 25 {
             println!("Should have stopped playing");
             println!("Still playing? {}", is_playing);
             break;
@@ -102,5 +103,5 @@ fn main() {
     // let sink = Sink::try_new(&stream_handle).unwrap();
     // sink.set_volume(0.1);
     // sink.append(source);
-    loop {}
+    //loop {}
 }
