@@ -3,6 +3,7 @@ use crate::error::Error;
 use crate::track::Track;
 pub trait MediaPlayer {
     fn play(&mut self, track: &Track) -> Result<(), Error>;
+    fn stop(&mut self) -> Result<(), Error>;
 }
 
 struct MediaPlayerImplementation<T: AudioLib> {
@@ -28,6 +29,11 @@ impl<T: AudioLib> MediaPlayer for MediaPlayerImplementation<T> {
         }
         Ok(())
     }
+
+    fn stop(&mut self) -> Result<(), Error> {
+        self.last_track = None;
+        self.audio_lib.stop()
+    }
 }
 
 impl<T: AudioLib> MediaPlayerImplementation<T> {
@@ -39,29 +45,27 @@ impl<T: AudioLib> MediaPlayerImplementation<T> {
     }
 }
 
-struct DummyAudioLib;
-impl AudioLib for DummyAudioLib {
-    fn play(&self, track: &Track) -> Result<(), Error> {
-        Ok(())
-    }
-    fn stop(&self) {}
-    fn is_playing(&self) -> bool {
-        false
-    }
-}
-
 pub(crate) fn open<T: AudioLib>(audio_lib: T) -> Result<impl MediaPlayer, Error> {
     MediaPlayerImplementation::from(audio_lib)
-}
-
-pub(crate) fn open_dummy() -> Result<impl MediaPlayer, Error> {
-    MediaPlayerImplementation::from(DummyAudioLib)
 }
 
 #[cfg(test)]
 #[cfg(not(tarpaulin_include))]
 mod tests {
     use super::*;
+
+    struct DummyAudioLib;
+    impl AudioLib for DummyAudioLib {
+        fn play(&self, track: &Track) -> Result<(), Error> {
+            Ok(())
+        }
+        fn stop(&mut self) -> Result<(), Error> {
+            Ok(())
+        }
+        fn is_playing(&self) -> bool {
+            false
+        }
+    }
 
     #[test]
     fn test_play() {

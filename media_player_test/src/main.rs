@@ -1,14 +1,15 @@
 extern crate rodio;
 use rodio::Decoder;
+use rodio::OutputStream;
+use rodio::OutputStreamHandle;
 use rodio::Sink;
 use rodio::Source;
-use rodio::OutputStreamHandle;
-use rodio::OutputStream;
 use std::fs::File;
 use std::io::BufReader;
 use std::thread::sleep;
 use std::time::Duration;
 
+#[cfg(not(tarpaulin_include))]
 fn do_play() {
     let (stream, stream_handle) = rodio::OutputStream::try_default().unwrap();
     //let sink = Sink::try_new(&stream_handle).unwrap();
@@ -47,6 +48,7 @@ fn do_play() {
     }
 }
 
+#[cfg(not(tarpaulin_include))]
 fn play(path: &str) -> (Sink, OutputStream, OutputStreamHandle) {
     let (stream, stream_handle) = rodio::OutputStream::try_default().unwrap();
 
@@ -60,6 +62,7 @@ fn play(path: &str) -> (Sink, OutputStream, OutputStreamHandle) {
     (sink, stream, stream_handle)
 }
 
+#[cfg(not(tarpaulin_include))]
 fn do_play2() {
     let (mut sink, mut stream, mut stream_handle) = play("sound.flac");
 
@@ -91,6 +94,7 @@ fn do_play2() {
     println!("sound over");
 }
 
+#[cfg(not(tarpaulin_include))]
 fn main() {
     do_play2();
     //let (sink, stream, stream_handle) = play("sound.flac");

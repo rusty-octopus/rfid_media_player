@@ -3,6 +3,6 @@ use crate::track::Track;
 
 pub(crate) trait AudioLib {
     fn play(&self, track: &Track) -> Result<(), Error>;
-    fn stop(&self);
+    fn stop(&mut self) -> Result<(), Error>;
     fn is_playing(&self) -> bool;
 }

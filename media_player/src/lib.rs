@@ -10,5 +10,6 @@ pub use mediaplayer::MediaPlayer;
 pub use track::Track;
 
 pub fn open() -> Result<impl MediaPlayer, Error> {
-    mediaplayer::open_dummy()
+    let audiolib = rodiolib::open()?;
+    mediaplayer::open(audiolib)
 }

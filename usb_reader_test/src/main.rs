@@ -1,6 +1,7 @@
 extern crate rusb;
 use std::time::Duration;
 
+#[cfg(not(tarpaulin_include))]
 fn main() {
     for device in rusb::devices().unwrap().iter() {
         let device_desc = device.device_descriptor().unwrap();
