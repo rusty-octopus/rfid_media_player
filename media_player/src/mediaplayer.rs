@@ -1,8 +1,24 @@
+#![warn(missing_docs)]
+#![warn(missing_doc_code_examples)]
+#![forbid(unsafe_code)]
+
 use crate::audiolib::AudioLib;
 use crate::error::Error;
 use crate::track::Track;
+/// The [`MediaPlayer`](crate::MediaPlayer) trait.
+///
+/// Enables playing tracks and stopping the playback.
+/// When a new track is played, the playback of the old one is stopped (if still playing).
 pub trait MediaPlayer {
+    /// Plays the [`Track`].
+    ///
+    /// Results in an [`IoError`](crate::Error::IoError) if the file does not exist (or any other possible file access error).
+    /// Results in an [`AudioLibError`](crate::Error::AudioLibError) if there was an error raised by the underlying audio library.
     fn play(&mut self, track: &Track) -> Result<(), Error>;
+
+    /// Stops the playback.
+    ///
+    /// Results in an [`AudioLibError`](crate::Error::AudioLibError) if there was an error raised by the underlying audio library.
     fn stop(&mut self) -> Result<(), Error>;
 }
 
@@ -15,7 +31,7 @@ impl<T: AudioLib> MediaPlayer for MediaPlayerImplementation<T> {
     fn play(&mut self, track: &Track) -> Result<(), Error> {
         if let Some(last_track) = &self.last_track {
             if last_track != track {
-                self.audio_lib.stop();
+                self.audio_lib.stop()?;
                 self.audio_lib.play(&track)?;
                 self.last_track = Some(track.clone());
             } else {
@@ -56,7 +72,7 @@ mod tests {
 
     struct DummyAudioLib;
     impl AudioLib for DummyAudioLib {
-        fn play(&self, track: &Track) -> Result<(), Error> {
+        fn play(&self, _track: &Track) -> Result<(), Error> {
             Ok(())
         }
         fn stop(&mut self) -> Result<(), Error> {
@@ -85,8 +101,10 @@ mod tests {
     #[test]
     fn test_old_song_is_played_again() {
         let mut media_player = MediaPlayerImplementation::from(DummyAudioLib).unwrap();
-        media_player.play(&String::from("/path/to/track/1").into());
-        media_player.play(&"/path/to/track/1".into());
+        media_player
+            .play(&String::from("/path/to/track/1").into())
+            .unwrap();
+        media_player.play(&"/path/to/track/1".into()).unwrap();
         assert_eq!(
             media_player.last_track,
             Some(Track::from("/path/to/track/1"))

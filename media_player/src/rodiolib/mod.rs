@@ -1,3 +1,7 @@
+#![warn(missing_docs)]
+#![warn(missing_doc_code_examples)]
+#![forbid(unsafe_code)]
+
 use rodio::{OutputStream, OutputStreamHandle, Sink};
 
 use std::fs::File;
@@ -48,7 +52,7 @@ impl AudioLib for RodioLib {
         Ok(())
     }
     fn is_playing(&self) -> bool {
-        self.sink.empty()
+        !self.sink.empty()
     }
 }
 
@@ -89,5 +93,59 @@ mod tests {
     fn test_create_triple() {
         let result = create_new_triple();
         assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_is_playing() {
+        let mut rodio_lib = open().unwrap();
+        let is_playing = rodio_lib.is_playing();
+        assert_eq!(false, is_playing);
+
+        let track = Track::from("tests/rand1.wav");
+        rodio_lib.play(&track).unwrap();
+        assert_eq!(true, rodio_lib.is_playing());
+
+        rodio_lib.stop().unwrap();
+        assert_eq!(false, rodio_lib.is_playing());
+    }
+
+    #[test]
+    fn test_from_play_error() {
+        let rodio_error = rodio::PlayError::NoDevice;
+        let error = Error::from(rodio_error);
+        assert_eq!(Error::AudioLibError(String::from("NoDevice")), error);
+    }
+
+    #[test]
+    fn test_from_stream_error() {
+        let rodio_error = rodio::StreamError::NoDevice;
+        let error = Error::from(rodio_error);
+        assert_eq!(Error::AudioLibError(String::from("NoDevice")), error);
+    }
+
+    #[test]
+    fn test_from_devices_error() {
+        extern crate cpal;
+
+        let rodio_error = rodio::DevicesError::BackendSpecific {
+            err: cpal::BackendSpecificError {
+                description: String::from(""),
+            },
+        };
+        let error = Error::from(rodio_error);
+        assert_eq!(
+            Error::AudioLibError(String::from("A backend-specific error has occurred: ")),
+            error
+        );
+    }
+
+    #[test]
+    fn test_from_decoder_error() {
+        let rodio_error = rodio::decoder::DecoderError::UnrecognizedFormat;
+        let error = Error::from(rodio_error);
+        assert_eq!(
+            Error::AudioLibError(String::from("Unrecognized format")),
+            error
+        );
     }
 }

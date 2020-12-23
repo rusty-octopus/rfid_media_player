@@ -1,10 +1,18 @@
 [package]
 name = "media_player"
-version = "0.1.0"
+version = "1.0.0"
 authors = ["rusty-octopus <rustyoctopus@posteo.org>"]
 edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "MIT"
+readme = "Readme.md"
+description = "Crate for playing audio tracks."
+repository = ""
+homepage = ""
+categories = [""]
+keywords = ["audio"]
 
 [dependencies]
 rodio = "0.13.0"
+
+[dev-dependencies]
+cpal = "0.13.1"

@@ -2,7 +2,7 @@
 #![warn(missing_doc_code_examples)]
 #![forbid(unsafe_code)]
 
-/// Track store errors errors.
+/// Track store errors.
 ///
 /// Defines all runtime errors.
 #[derive(Debug, PartialEq)]
