@@ -1,0 +1,18 @@
+[package]
+name = "rfid_media_player"
+version = "0.1.0"
+authors = ["rusty-octopus <rustyoctopus@posteo.org>"]
+edition = "2018"
+license = "MIT"
+readme = "Readme.md"
+description = "An application that can play a track upon reading a rfid card."
+repository = ""
+homepage = ""
+categories = [""]
+keywords = ["yaml", "usb", "audio"]
+
+[dependencies]
+rfid_reader = {path="../rfid_reader", version = "1.0.0"}
+track_store = {path="../track_store", version = "1.0.0"}
+media_player = {path="../media_player", version = "1.0.0"}
+signal-hook = "0.3.1"

@@ -5,5 +5,6 @@ members = [
     "usb_reader_test",
     "track_store",
     "media_player",
-    "media_player_test"
+    "media_player_test",
+    "rfid_media_player"
 ]
