@@ -22,8 +22,20 @@ impl From<&str> for Track {
     }
 }
 
+impl AsRef<str> for Track {
+    fn as_ref(&self) -> &str {
+        self.0.as_ref()
+    }
+}
+
 impl AsRef<Path> for Track {
     fn as_ref(&self) -> &Path {
         self.0.as_ref()
+    }
+}
+
+impl std::fmt::Display for Track {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {
+        write!(f, "{:}", self)
     }
 }

@@ -2,8 +2,8 @@
 
 ## Todos
 
-1. Media Player
-2. Cli Application
+1. Cli Application
+2. SystemD file & test
 3. Cross Compile
 
 ## Links

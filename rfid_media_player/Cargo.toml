@@ -16,3 +16,5 @@ rfid_reader = {path="../rfid_reader", version = "1.0.0"}
 track_store = {path="../track_store", version = "1.0.0"}
 media_player = {path="../media_player", version = "1.0.0"}
 signal-hook = "0.3.1"
+log = "0.4.11"
+flexi_logger = "0.16.2"

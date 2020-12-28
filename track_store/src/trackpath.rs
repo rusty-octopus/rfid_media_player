@@ -2,6 +2,8 @@
 #![warn(missing_doc_code_examples)]
 #![forbid(unsafe_code)]
 
+use std::fmt::Display;
+
 use serde::{Deserialize, Serialize};
 
 /// The path of a track.
@@ -19,5 +21,17 @@ impl From<String> for TrackPath {
 impl From<&str> for TrackPath {
     fn from(path: &str) -> Self {
         TrackPath(path.into())
+    }
+}
+
+impl AsRef<str> for TrackPath {
+    fn as_ref(&self) -> &str {
+        self.0.as_ref()
+    }
+}
+
+impl Display for TrackPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {
+        write!(f, "{:}", self)
     }
 }

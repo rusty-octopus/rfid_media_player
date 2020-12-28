@@ -21,3 +21,9 @@ impl From<&str> for Id {
         Id(path.into())
     }
 }
+
+impl std::fmt::Display for Id {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {
+        write!(f, "{:}", self)
+    }
+}
