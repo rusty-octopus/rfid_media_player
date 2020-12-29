@@ -16,7 +16,12 @@ pub trait RfidReader: std::fmt::Debug {
     /// Tries to read from the RfidReader.
     ///
     /// A String of the processed raw data is returned on success. Otherwise an error is returned.
-    /// Method is blocking, this means it will try to read data, until a valid RFID was read or an error has occured.
+    /// Method is blocking, this means it will try to read data, until a valid RFID was read or an error has occurred.
+    ///
+    /// The error [`Timeout`](crate::Error::Timeout) will occur after the defined timeout expired.
+    /// One can simply call this method again, since it is not a fatal error. However as mentioned above, the call to this method
+    /// is blocking. This means when the [`Timeout`](crate::Error::Timeout) occurs, one can do something different like checking
+    /// for OS signals that may signal that the application has to be terminated.
     fn read(&self) -> Result<String, Error>;
     /// Tries to de-initialize the USB device of the RfidReader, which may fail.
     fn deinitialize(&mut self) -> Result<(), Error>;

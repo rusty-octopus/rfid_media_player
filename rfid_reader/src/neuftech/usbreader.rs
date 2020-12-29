@@ -42,11 +42,7 @@ impl<T: HumbleUsbDevice> UsbReader for NeuftechUsbReader<T> {
                 raw_data_interpreter.process(&buffer)?;
             } else {
                 let error = result.unwrap_err();
-                if error == Error::Timeout {
-                    continue;
-                } else {
-                    return Err(error);
-                }
+                return Err(error);
             }
         }
         Ok(Box::new(raw_data_interpreter.data))
@@ -227,7 +223,6 @@ mod tests {
     struct DummyHumbleUsbDevice {
         index: std::cell::Cell<usize>,
         enter_happened: std::cell::Cell<bool>,
-        timeout_happened: std::cell::Cell<bool>,
         deinitialized: bool,
     }
 
@@ -242,26 +237,21 @@ mod tests {
             Ok(())
         }
         fn read(&self, buffer: &mut [u8]) -> Result<(), Error> {
-            let timeout_happened = self.timeout_happened.get();
-            if timeout_happened {
-                let index = self.index.get();
+            let index = self.index.get();
 
-                if index < 10 {
-                    buffer[2] = 30;
-                    self.index.set(index + 1);
-                } else {
-                    let enter_happened = self.enter_happened.get();
-                    if enter_happened {
-                        buffer[2] = 0;
-                    } else {
-                        buffer[2] = 40;
-                        self.enter_happened.set(true);
-                    }
-                }
+            if index < 10 {
+                buffer[2] = 30;
+                self.index.set(index + 1);
             } else {
-                self.timeout_happened.set(true);
-                return Err(Error::Timeout);
+                let enter_happened = self.enter_happened.get();
+                if enter_happened {
+                    buffer[2] = 0;
+                } else {
+                    buffer[2] = 40;
+                    self.enter_happened.set(true);
+                }
             }
+
             Ok(())
         }
         fn claim_interface(&mut self) -> Result<(), Error> {
@@ -289,7 +279,6 @@ mod tests {
         let dummy_device = DummyHumbleUsbDevice {
             index: 0.into(),
             enter_happened: false.into(),
-            timeout_happened: false.into(),
             deinitialized: false,
         };
         let usb_reader = NeuftechUsbReader::new(dummy_device).unwrap();

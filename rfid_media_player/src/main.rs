@@ -3,7 +3,7 @@ use rfid_media_player::{open, RfidMediaPlayer};
 use rfid_reader::{ProductId, RfidReader, VendorId};
 
 use flexi_logger::{Duplicate, LogTarget, Logger};
-use log::{error, info};
+use log::{debug, error, info};
 
 use signal_hook::consts::TERM_SIGNALS;
 use signal_hook::iterator::Signals;
@@ -15,24 +15,10 @@ use std::{
     time::Duration,
 };
 
-fn read_rfid(rfid_reader: &impl RfidReader) -> Option<String> {
-    let read_result = rfid_reader.read();
-    match read_result {
-        Ok(rfid_value) => {
-            info!("Received RFID value: {}", rfid_value);
-            Some(rfid_value)
-        }
-        Err(error) => {
-            error!("Reading RFID resolved in error: {}", error);
-            None
-        }
-    }
-}
-
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // TODO: Use clap to get all parameters
 
-    let log_spec = "info";
+    let log_spec = "debug";
 
     let mut logger = Logger::with_str(log_spec).log_target(LogTarget::File);
 
@@ -42,6 +28,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     logger.start()?;
 
+    info!("Started rfid_media_player");
+
     // neuftech device
     let vendor_id = VendorId::from(0x16c0);
     let product_id = ProductId::from(0x27db);
@@ -50,7 +38,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     //let vendor_id = VendorId::from(0x0cf3);
     //let product_id = ProductId::from(0x3005);
 
-    let timeout = Duration::from_secs(60);
+    let timeout = Duration::from_secs(1);
     // TODO: add actual id here
     let yaml_string = "0006641642: ../media_player/tests/rand1.wav";
 
@@ -70,14 +58,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         });
 
-        //while running.load(Ordering::SeqCst) {
-        let rfid_reader = rfid_reader::open(vendor_id, product_id, timeout)?;
-        loop {
-            //let value = rfid_reader.read()?;
-            //info!("Read value: {}", value);
+        let mut counter = 0;
+        while running.load(Ordering::SeqCst) {
             rfid_media_player.run();
-            //let option_rfid_value = read_rfid(&rfid_reader);
-            //info!("Optional value: {:?}", option_rfid_value);
+            counter += 1;
+            debug!("Time elapsed: {} s", counter);
         }
         rfid_media_player.shutdown();
     }

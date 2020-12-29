@@ -87,6 +87,8 @@ impl From<rodio::decoder::DecoderError> for Error {
 #[cfg(test)]
 #[cfg(not(tarpaulin_include))]
 mod tests {
+    use std::time::Duration;
+
     use super::*;
 
     #[test]
@@ -106,6 +108,25 @@ mod tests {
         assert_eq!(true, rodio_lib.is_playing());
 
         rodio_lib.stop().unwrap();
+        assert_eq!(false, rodio_lib.is_playing());
+    }
+
+    #[test]
+    fn test_is_playing_to_the_end() {
+        let mut rodio_lib = open().unwrap();
+        let is_playing = rodio_lib.is_playing();
+        assert_eq!(false, is_playing);
+
+        let track = Track::from("tests/rand1.wav");
+        rodio_lib.play(&track).unwrap();
+        assert_eq!(true, rodio_lib.is_playing());
+
+        for i in 0..32 {
+            std::thread::sleep(Duration::from_secs(1));
+            println!("Time elapsed: {} s", i + 1);
+            assert_eq!(true, rodio_lib.is_playing());
+        }
+        std::thread::sleep(Duration::from_secs(3));
         assert_eq!(false, rodio_lib.is_playing());
     }
 

@@ -36,14 +36,28 @@ where
     T: TrackStore,
 {
     fn run(&mut self) {
-        let option_rfid_value = read_rfid(&self.rfid_reader);
-        debug!("Optional rfid value {:?} ", option_rfid_value);
-        if let Some(rfid_value) = option_rfid_value {
-            debug!("Try to get track path",);
-            let option_track_path = get_track(&self.track_store, rfid_value);
-            if let Some(track_path) = option_track_path {
-                play_track(&mut self.media_player, track_path)
+        let read_result = self.rfid_reader.read();
+        match read_result {
+            Ok(rfid_value) => {
+                info!("Received RFID value: {}", rfid_value);
+                let option_track_path = get_track(&self.track_store, rfid_value);
+                if let Some(track_path) = option_track_path {
+                    play_track(&mut self.media_player, track_path)
+                }
             }
+            Err(error) => match error {
+                rfid_reader::Error::Timeout => {
+                    debug!(
+                        "Timeout error occurred ({}) which will be recovered.",
+                        error
+                    );
+                    // enable callee to be non-blocking
+                    return;
+                }
+                _ => {
+                    error!("Reading RFID resolved in error: {}", error);
+                }
+            },
         }
     }
 
@@ -77,17 +91,26 @@ where
     }
 }
 
-fn read_rfid(rfid_reader: &impl RfidReader) -> Option<String> {
+fn read_rfid(rfid_reader: &impl RfidReader) -> Result<String, rfid_reader::Error> {
     let read_result = rfid_reader.read();
     match read_result {
         Ok(rfid_value) => {
             info!("Received RFID value: {}", rfid_value);
-            Some(rfid_value)
+            Ok(rfid_value)
         }
-        Err(error) => {
-            error!("Reading RFID resolved in error: {}", error);
-            None
-        }
+        Err(error) => match error {
+            rfid_reader::Error::Timeout => {
+                debug!(
+                    "Timeout error occurred ({}) which will be recovered.",
+                    error
+                );
+                Err(error)
+            }
+            _ => {
+                error!("Reading RFID resolved in error: {}", error);
+                Err(error)
+            }
+        },
     }
 }
 

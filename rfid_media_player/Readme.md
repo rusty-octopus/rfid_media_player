@@ -2,13 +2,15 @@
 
 ## Todos
 
-1. Introduce and use own error type
-2. Logging helper: create spec etc.
-3. Yaml file open helper
-4. clap
-5. Fix signal hook: double Crtl+C
-    * Need another solution here that "destroys" run
-6. tests & documentation
+1. ~~Introduce and use own error type~~ Use `Box<dyn Error>` for open & run
+2. Consider run returning `Result`
+3. Consider moving loop to `run`
+4. Inner mutability with cell?
+5. Logging helper: create spec etc.
+6. Yaml file open helper => Needed?
+7. clap
+8. tests & documentation all crates!
+9. Consider implementing read result as RfidValue NewType
 
 ## Reading core dump files on ArchLinux
 

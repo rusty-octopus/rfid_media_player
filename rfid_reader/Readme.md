@@ -23,14 +23,14 @@ let vendor_id = VendorId::from(0x16c0);
 let product_id = ProductId::from(0x27db);
 
 // Define a timeout (i.e. how long waits the reader for a RFID chip).
-// From my experience, the longer the better.
+// From my experience, the longer the better, however it will block this amount of time.
 let timeout = Duration::from_secs(60);
-
 // get the rfid device, this may fail, for example when the device does not exist
 let mut rfid_reader = rfid_reader::open(vendor_id, product_id, timeout).unwrap();
 
 // Read from the device. This is blocking!
-// It should normally return a String containing numbers, but it may also fail
+// It should normally return a String containing numbers, but it may also fail.
+// It will return Error::Timeout whenever the timeout has expired
 let data = rfid_reader.read().unwrap();
 
 // Ideally de-initialize the device when no longer needed.
