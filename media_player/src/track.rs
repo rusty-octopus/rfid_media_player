@@ -36,6 +36,6 @@ impl AsRef<Path> for Track {
 
 impl std::fmt::Display for Track {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {
-        write!(f, "{:}", self)
+        write!(f, "{}", self.0)
     }
 }

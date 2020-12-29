@@ -42,37 +42,45 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     logger.start()?;
 
+    // neuftech device
     let vendor_id = VendorId::from(0x16c0);
     let product_id = ProductId::from(0x27db);
+
+    // bluetooth device
+    //let vendor_id = VendorId::from(0x0cf3);
+    //let product_id = ProductId::from(0x3005);
+
     let timeout = Duration::from_secs(60);
     // TODO: add actual id here
     let yaml_string = "0006641642: ../media_player/tests/rand1.wav";
 
-    //if let Some(mut rfid_media_player) = open(vendor_id, product_id, timeout, yaml_string) {
-    // Shared atomic bool to signal that the program is aborted
-    let running = Arc::new(AtomicBool::new(true));
-    let r = running.clone();
+    if let Some(mut rfid_media_player) = open(vendor_id, product_id, timeout, yaml_string) {
+        // Shared atomic bool to signal that the program is aborted
+        let running = Arc::new(AtomicBool::new(true));
+        let r = running.clone();
 
-    // all terminating signals
-    let mut signals = Signals::new(TERM_SIGNALS)?;
+        // all terminating signals
+        let mut signals = Signals::new(TERM_SIGNALS)?;
 
-    // spawn a thread to react to all terminating signals
-    thread::spawn(move || {
-        for sig in signals.forever() {
-            info!("Received signal {:?}", sig);
-            r.store(false, Ordering::SeqCst);
+        // spawn a thread to react to all terminating signals
+        thread::spawn(move || {
+            for sig in signals.forever() {
+                info!("Received signal {:?}", sig);
+                r.store(false, Ordering::SeqCst);
+            }
+        });
+
+        //while running.load(Ordering::SeqCst) {
+        let rfid_reader = rfid_reader::open(vendor_id, product_id, timeout)?;
+        loop {
+            //let value = rfid_reader.read()?;
+            //info!("Read value: {}", value);
+            rfid_media_player.run();
+            //let option_rfid_value = read_rfid(&rfid_reader);
+            //info!("Optional value: {:?}", option_rfid_value);
         }
-    });
-
-    //while running.load(Ordering::SeqCst) {
-    let rfid_reader = rfid_reader::open(vendor_id, product_id, timeout)?;
-    loop {
-        //let value = rfid_reader.read()?;
-        //info!("Read value: {}", value);
-        read_rfid(&rfid_reader);
+        rfid_media_player.shutdown();
     }
-    //rfid_media_player.shutdown();
-    //}
 
     Ok(())
 }
