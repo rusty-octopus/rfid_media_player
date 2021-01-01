@@ -2,15 +2,10 @@
 
 ## Todos
 
-1. ~~Introduce and use own error type~~ Use `Box<dyn Error>` for open & run
-2. Consider run returning `Result`
-3. Consider moving loop to `run`
-4. Inner mutability with cell?
-5. Logging helper: create spec etc.
-6. Yaml file open helper => Needed?
-7. clap
-8. tests & documentation all crates!
-9. Consider implementing read result as RfidValue NewType
+1. clap
+2. Logging helper: create spec etc.
+3. tests & documentation all crates!
+4. Consider implementing read result as RfidValue NewType
 
 ## Reading core dump files on ArchLinux
 

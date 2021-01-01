@@ -1,9 +1,9 @@
 use rfid_media_player::{open, RfidMediaPlayer};
 
-use rfid_reader::{ProductId, RfidReader, VendorId};
+use rfid_reader::{ProductId, VendorId};
 
 use flexi_logger::{Duplicate, LogTarget, Logger};
-use log::{debug, error, info};
+use log::info;
 
 use signal_hook::consts::TERM_SIGNALS;
 use signal_hook::iterator::Signals;
@@ -39,33 +39,31 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     //let product_id = ProductId::from(0x3005);
 
     let timeout = Duration::from_secs(1);
-    // TODO: add actual id here
+
     let yaml_string = "0006641642: ../media_player/tests/rand1.wav";
 
-    if let Some(mut rfid_media_player) = open(vendor_id, product_id, timeout, yaml_string) {
-        // Shared atomic bool to signal that the program is aborted
-        let running = Arc::new(AtomicBool::new(true));
-        let r = running.clone();
+    let mut rfid_media_player = open(vendor_id, product_id, timeout, yaml_string)?;
 
-        // all terminating signals
-        let mut signals = Signals::new(TERM_SIGNALS)?;
+    info!("Opened RfidMediaPlayer succesfully");
+    // Shared atomic bool to signal that the program is aborted
+    let running = Arc::new(AtomicBool::new(true));
+    let r = running.clone();
 
-        // spawn a thread to react to all terminating signals
-        thread::spawn(move || {
-            for sig in signals.forever() {
-                info!("Received signal {:?}", sig);
-                r.store(false, Ordering::SeqCst);
-            }
-        });
+    // all terminating signals
+    let mut signals = Signals::new(TERM_SIGNALS)?;
 
-        let mut counter = 0;
-        while running.load(Ordering::SeqCst) {
-            rfid_media_player.run();
-            counter += 1;
-            debug!("Time elapsed: {} s", counter);
+    // spawn a thread to react to all terminating signals
+    thread::spawn(move || {
+        for sig in signals.forever() {
+            info!("Received signal {:?}", sig);
+            r.store(false, Ordering::SeqCst);
         }
-        rfid_media_player.shutdown();
+    });
+
+    while running.load(Ordering::SeqCst) {
+        rfid_media_player.run()?;
     }
+    rfid_media_player.shutdown()?;
 
     Ok(())
 }
