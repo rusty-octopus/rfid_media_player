@@ -6,9 +6,15 @@ use std::time::Duration;
 
 use log::error;
 
+mod cli_app;
 mod error;
 mod rfidmediaplayer;
 
+pub use cli_app::{
+    convert_to_id, create_app, CONSOLE_LOG_ARGUMENT_NAME, LOG_LEVEL_ARGUMENT_NAME,
+    PRODUCT_ID_ARGUMENT_NAME, TIMEOUT_ARGUMENT_NAME, TRACKS_FILE_ARGUMENT_NAME,
+    VENDOR_ID_ARGUMENT_NAME,
+};
 pub use error::Error;
 pub use rfidmediaplayer::RfidMediaPlayer;
 

@@ -2,10 +2,13 @@
 
 ## Todos
 
-1. clap
-2. Logging helper: create spec etc.
 3. tests & documentation all crates!
 4. Consider implementing read result as RfidValue NewType
+
+## Neuftech IDs
+
+* Vendor ID 16c0
+* Product ID 0x27db
 
 ## Reading core dump files on ArchLinux
 

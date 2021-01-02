@@ -1,4 +1,8 @@
-use rfid_media_player::{open, RfidMediaPlayer};
+use rfid_media_player::{
+    convert_to_id, create_app, open, RfidMediaPlayer, CONSOLE_LOG_ARGUMENT_NAME,
+    LOG_LEVEL_ARGUMENT_NAME, PRODUCT_ID_ARGUMENT_NAME, TIMEOUT_ARGUMENT_NAME,
+    TRACKS_FILE_ARGUMENT_NAME, VENDOR_ID_ARGUMENT_NAME,
+};
 
 use rfid_reader::{ProductId, VendorId};
 
@@ -16,13 +20,14 @@ use std::{
 };
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // TODO: Use clap to get all parameters
+    let matches = create_app().get_matches();
 
-    let log_spec = "debug";
+    // default is set, therefore unwrapping is safe.
+    let log_spec = matches.value_of(LOG_LEVEL_ARGUMENT_NAME).unwrap();
 
     let mut logger = Logger::with_str(log_spec).log_target(LogTarget::File);
 
-    let stdout = true;
+    let stdout = matches.is_present(CONSOLE_LOG_ARGUMENT_NAME);
     if stdout {
         logger = logger.duplicate_to_stdout(Duplicate::All);
     }
@@ -30,21 +35,30 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     info!("Started rfid_media_player");
 
-    // neuftech device
-    let vendor_id = VendorId::from(0x16c0);
-    let product_id = ProductId::from(0x27db);
+    let vendor_id = VendorId::from(convert_to_id(
+        matches
+            .value_of(VENDOR_ID_ARGUMENT_NAME)
+            .unwrap()
+            .to_string(),
+    )?);
+    let product_id = ProductId::from(convert_to_id(
+        matches
+            .value_of(PRODUCT_ID_ARGUMENT_NAME)
+            .unwrap()
+            .to_string(),
+    )?);
 
-    // bluetooth device
-    //let vendor_id = VendorId::from(0x0cf3);
-    //let product_id = ProductId::from(0x3005);
+    let timeout = Duration::from_millis(u64::from_str_radix(
+        matches.value_of(TIMEOUT_ARGUMENT_NAME).unwrap(),
+        10,
+    )?);
 
-    let timeout = Duration::from_secs(1);
+    let yaml_string =
+        std::fs::read_to_string(matches.value_of(TRACKS_FILE_ARGUMENT_NAME).unwrap())?;
 
-    let yaml_string = "0006641642: ../media_player/tests/rand1.wav";
+    let mut rfid_media_player = open(vendor_id, product_id, timeout, &yaml_string)?;
 
-    let mut rfid_media_player = open(vendor_id, product_id, timeout, yaml_string)?;
-
-    info!("Opened RfidMediaPlayer succesfully");
+    info!("Opened RfidMediaPlayer successfully");
     // Shared atomic bool to signal that the program is aborted
     let running = Arc::new(AtomicBool::new(true));
     let r = running.clone();
