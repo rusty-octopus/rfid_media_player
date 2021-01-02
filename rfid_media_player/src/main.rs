@@ -58,7 +58,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut rfid_media_player = open(vendor_id, product_id, timeout, &yaml_string)?;
 
-    info!("Opened RfidMediaPlayer successfully");
+    info!("Application opened successfully");
+
     // Shared atomic bool to signal that the program is aborted
     let running = Arc::new(AtomicBool::new(true));
     let r = running.clone();
