@@ -19,6 +19,7 @@ use std::{
     time::Duration,
 };
 
+#[cfg(not(tarpaulin_include))]
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let matches = create_app().get_matches();
 
@@ -78,7 +79,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     while running.load(Ordering::SeqCst) {
         rfid_media_player.run()?;
     }
+    info!("Shutting down ...");
     rfid_media_player.shutdown()?;
-
+    info!("Shutting complete.");
     Ok(())
 }

@@ -27,3 +27,16 @@ impl std::fmt::Display for Id {
         write!(f, "{}", self.0)
     }
 }
+
+#[cfg(test)]
+#[cfg(not(tarpaulin_include))]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_display() {
+        let id = Id::from("01234");
+        let formatted_id = format!("{}", id);
+        assert_eq!(String::from("01234"), formatted_id);
+    }
+}

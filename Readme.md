@@ -2,9 +2,12 @@
 
 ## Todos
 
-1. Cli Application
+1. Documentation rfid_media_player
 2. SystemD file & test
-3. Cross Compile
+    * [Arch Wiki - SystemD](https://wiki.archlinux.org/index.php/Systemd)
+3. Cross Compile + documentation in crates + here
+4. Documentation here
+5. License analysis dependencies: Either MIT or Apache 2.0 from all direct deps
 
 ## Links
 
@@ -16,10 +19,6 @@
 * [USB keyboard codes](https://www.win.tue.nl/~aeb/linux/kbd/scancodes-14.html)
 * [cross](https://crates.io/crates/cross)
 
-## Useful crates
-
-* [rodio](https://docs.rs/rodio/0.12.0/rodio/)
-  * [Sink](https://docs.rs/rodio/0.12.0/rodio/struct.Sink.html)
 
 ## Architecture
 

@@ -24,6 +24,7 @@ mod media_player_integration_tests {
     }
 
     #[test]
+    #[ignore = "Test of correct usage of rodio"]
     fn test_play_until_the_end() {
         let mut media_player = open().unwrap();
         let track = Track::from("tests/rand1.wav");

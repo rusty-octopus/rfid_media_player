@@ -35,3 +35,16 @@ impl Display for TrackPath {
         write!(f, "{}", self.0)
     }
 }
+
+#[cfg(test)]
+#[cfg(not(tarpaulin_include))]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_display() {
+        let track_path = TrackPath::from("path");
+        let formatted_track_path = format!("{}", track_path);
+        assert_eq!(String::from("path"), formatted_track_path);
+    }
+}

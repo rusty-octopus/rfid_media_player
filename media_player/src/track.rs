@@ -39,3 +39,23 @@ impl std::fmt::Display for Track {
         write!(f, "{}", self.0)
     }
 }
+
+#[cfg(test)]
+#[cfg(not(tarpaulin_include))]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_as_ref() {
+        let track = Track::from("track");
+        let as_ref: &str = track.as_ref();
+        assert_eq!("track", as_ref);
+    }
+
+    #[test]
+    fn test_display() {
+        let track = Track::from("track");
+        let formatted_track = format!("{}", track);
+        assert_eq!("track".to_string(), formatted_track);
+    }
+}

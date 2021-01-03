@@ -112,6 +112,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore = "Test of correct usage of rodio"]
     fn test_is_playing_to_the_end() {
         let mut rodio_lib = open().unwrap();
         let is_playing = rodio_lib.is_playing();
