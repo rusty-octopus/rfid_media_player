@@ -19,7 +19,6 @@
 * [USB keyboard codes](https://www.win.tue.nl/~aeb/linux/kbd/scancodes-14.html)
 * [cross](https://crates.io/crates/cross)
 
-
 ## Architecture
 
 ### Component
@@ -29,20 +28,28 @@ component application
 component media_player
 component rfid_reader
 component tracks
-component file #Crimson
-component ctrlc #LightGrey
+component "std::fs" as file #Crimson
+component signal_hook #LightGrey
+component log #LightGrey
+component flexi_logger #LightGrey
 component rusb #LightGrey
 component rodio #LightGrey
 component serde #LightGrey
+component serde_yaml #LightGrey
+component clap #LightGrey
 
 application -down-> rfid_reader
 application -down-> media_player
 application -down-> file
-application -down-> ctrlc
+application -down-> signal_hook
 application -down-> tracks
+application -down-> clap
+application -down-> log
+application -down-> flexi_logger
 media_player -down-> rodio
 rfid_reader -down-> rusb
 tracks -down-> serde
+tracks -down-> serde_yaml
 
 ```
 
@@ -56,7 +63,7 @@ participant rfid_hw
 participant application
 participant rfid_reader
 participant data_base
-participant file #Crimson
+participant "std::fs" as file #Crimson
 participant media_player
 
 user --> rfid_hw: places card
