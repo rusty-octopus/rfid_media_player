@@ -2,7 +2,7 @@
 
 members = [
     "rfid_reader",
-    "usb_reader_test",
+    "rfid_reader_test",
     "track_store",
     "media_player",
     "media_player_test",

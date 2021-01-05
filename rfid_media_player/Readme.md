@@ -1,39 +1,20 @@
 # Readme
 
-## Todos
+* Application that can read RFID cards (TK4100, EM41000) and play tracks
+* Tracks must be supplied in a simple key value yaml file (key=RFID value, value=path to track)
+* Works with Neuftech USB RFID Reader ID
+  * Should work with other USB RFID Readers as long as they act as a keyboard and provide the RFID value as a decimal string with an enter at the end
+  * Vendor ID and Product ID must be provided to access the device (`lsusb` is of help here)
+* The application opens the device, therefore it must either have root access or the device must allow opening from an unprivileged user (e.g. `chmod a+w /dev/bus/002/004`)
 
-3. tests & documentation all crates!
-4. Consider implementing read result as RfidValue NewType
-
-## Neuftech IDs
-
-* Vendor ID 16c0
-* Product ID 0x27db
-
-## Reading core dump files on ArchLinux
-
-### Using coredeumpctl & gdb
-
-* You can use `coredumpctl gdb *match*` but this is not sufficient
-* You need `~/.gdbinit` file with the following content:
+## Basic usage
 
 ```shell
-add-auto-load-safe-path /home/<your user name>/.rustup/toolchains
-dir /home/<your user name>/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/etc/
+rfid_media_player --product_id <PRODUCT_ID> --tracks <TRACKS_FILE> --vendor_id <VENDOR_ID>
 ```
 
-* Additionally you must patch the `gdb_load_rust_pretty_printers.py` file in the folder added to your `~/.gdbinit`. Just add the following lines before any other code:
+* More information by calling:
 
-```python
-import sys
-from os import path
-self_dir = path.dirname(path.realpath(__file__))
-sys.path.append(self_dir)
+```shell
+rfid_media_player --help
 ```
-
-* See [Rust issue 33159](https://github.com/rust-lang/rust/issues/33159)
-
-### Using coredumptctl & rust-gdb
-
-* You need to dump the core dump into a file first `coredumpctl dump *match* > core_dump`
-* Then you can use `rust-gdb <path to your rust binary> <path to your core_dump file>`

@@ -1,15 +1,30 @@
 # Readme
 
+* Cargo workspace of rfid_media_player application
+
+## Relevant Crates
+
+* [rfid_media_player](./rfid_media_player/Readme.md): The application that plays a track when a RFID value is read
+* [rfid_reader](./rfid_reader/Readme.md): Library that handles with the USB RFID reader
+* [media_player](./media_player/Readme.md): Library that handles the playing of the tracks
+* [track_store](./track_store/Readme.md): Library that stores the RFID values as keys and the paths to the tracks as values
+
+## Example crates
+
+* [usb_reader_test](usb_reader_test/Readme.md): Simple application build in order to learn how to access the USB device
+* [media_player_test](media_player_test/Readme.md): Simple application build in order to learn how to use audio library
+
 ## Todos
 
-1. Documentation rfid_media_player
+1. Consider implementing read result as RfidValue NewType
 2. SystemD file & test
     * [Arch Wiki - SystemD](https://wiki.archlinux.org/index.php/Systemd)
+    * Add to documentation of rfid_media_player where to find and how to use service file
 3. Cross Compile + documentation in crates + here
 4. Documentation here
 5. License analysis dependencies: Either MIT or Apache 2.0 from all direct deps
 
-## Links
+## Useful Links
 
 * [Compile Rust for Raspberry Pi ARM](https://medium.com/swlh/compiling-rust-for-raspberry-pi-arm-922b55dbb050)
 * [Cli Handbook](https://rust-cli.github.io/book/index.html)
@@ -24,7 +39,7 @@
 ### Component
 
 ```plantuml
-component application
+component rfid_media_player
 component media_player
 component rfid_reader
 component tracks
@@ -38,15 +53,16 @@ component serde #LightGrey
 component serde_yaml #LightGrey
 component clap #LightGrey
 
-application -down-> rfid_reader
-application -down-> media_player
-application -down-> file
-application -down-> signal_hook
-application -down-> tracks
-application -down-> clap
-application -down-> log
-application -down-> flexi_logger
+rfid_media_player -down-> rfid_reader
+rfid_media_player -down-> media_player
+rfid_media_player -down-> file
+rfid_media_player -down-> signal_hook
+rfid_media_player -down-> tracks
+rfid_media_player -down-> clap
+rfid_media_player -down-> log
+rfid_media_player -down-> flexi_logger
 media_player -down-> rodio
+media_player -left-> file
 rfid_reader -down-> rusb
 tracks -down-> serde
 tracks -down-> serde_yaml
@@ -60,27 +76,27 @@ tracks -down-> serde_yaml
 ```plantuml
 actor user
 participant rfid_hw
-participant application
+participant rfid_media_player
 participant rfid_reader
-participant data_base
+participant track_store
 participant "std::fs" as file #Crimson
 participant media_player
 
 user --> rfid_hw: places card
 rfid_hw --> rfid_reader: interrupt read
-rfid_reader --> application: rfid number
-application -> media_player: still playing
-media_player --> application: false 
-application -> data_base: get path
-data_base --> application
-application -> file: read file
-file --> application
-application -> media_player: play song
+rfid_reader --> rfid_media_player: rfid number
+rfid_media_player -> track_store: get path
+track_store --> rfid_media_player
+rfid_media_player -> media_player: play
+media_player -> media_player: still playing?:false 
+media_player -> file: read file
+file --> media_player
+media_player -> media_player: play track
 note over media_player
 song is played in background
 end note
-media_player --> application
-application -> rfid_reader: re-activate & wait
+media_player --> rfid_media_player
+rfid_media_player -> rfid_reader: re-activate & wait
 ```
 
 #### Play new song with busy player
@@ -88,71 +104,26 @@ application -> rfid_reader: re-activate & wait
 ```plantuml
 actor user
 participant rfid_hw
-participant application
+participant rfid_media_player
 participant rfid_reader
-participant data_base
+participant track_store
 participant file #Crimson
 participant media_player
 
 user --> rfid_hw: places card
 rfid_hw --> rfid_reader: interrupt read
-rfid_reader --> application: rfid number
-application -> media_player: still playing
-media_player --> application: true
-application -> application: check old number=new number
-alt old number != new number
-  application -> data_base: get path
-  data_base --> application
-  application -> file: read file
-  file --> application
-  application -> media_player: stop current song
-  media_player --> application
-  application -> media_player: play song
-  media_player --> application
+rfid_reader --> rfid_media_player: rfid number
+rfid_media_player -> track_store: get path
+track_store --> rfid_media_player
+rfid_media_player -> media_player: play
+media_player -> media_player: still playing?:true
+media_player -> media_player: check new track!=old track
+alt old track != new track
+  media_player -> file: read file
+  file --> media_player
+  media_player -> media_player: stop current song
+  media_player -> media_player: play song
 end
-application -> rfid_reader: re-activate & wait
-```
-
-### rfid_reader
-
-```plantuml
-class RfidReader {
-  + open(): Result<RfidReader>
-  + read(): Future<String>
-  + drop()
-}
-
-interface KeyMap {
-  + map(u8):Result<char>
-}
-class NeuftechKeyMap
-
-
-interface UsbReadDevice {
-  + open(vendor_id, product_id):Result<UsbDevice>
-  + read(): Future<[u8]>
-  + drop()
-}
-
-class NeuftechUsbReadDevice
-
-note left of NeuftechUsbReadDevice
-  handles "protocol"
-  returns only array with
-  u8 values that represent keys
-end note
-
-class TimeoutHandler
-
-class libusb #LightGrey
-
-NeuftechUsbReadDevice -up-|> UsbReadDevice
-
-RfidReader -down-> UsbReadDevice
-RfidReader -down-> KeyMap
-
-NeuftechKeyMap .up-|> KeyMap
-
-NeuftechUsbReadDevice --> TimeoutHandler
-NeuftechUsbReadDevice -down-> libusb
+media_player --> rfid_media_player
+rfid_media_player -> rfid_reader: re-activate & wait
 ```
