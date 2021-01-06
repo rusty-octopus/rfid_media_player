@@ -19,7 +19,10 @@
 1. Consider implementing read result as RfidValue NewType
 2. SystemD file & test
     * [Arch Wiki - SystemD](https://wiki.archlinux.org/index.php/Systemd)
+    * [https://wiki.archlinux.org/index.php/Systemd/User]: Problem with running as root
+    * Debug running as root problem
     * Add to documentation of rfid_media_player where to find and how to use service file
+    * How to not need root access when accessing usb
 3. Cross Compile + documentation in crates + here
 4. Documentation here
 5. License analysis dependencies: Either MIT or Apache 2.0 from all direct deps

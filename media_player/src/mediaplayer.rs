@@ -16,6 +16,8 @@ pub trait MediaPlayer {
     /// Results in an [`AudioLibError`](crate::Error::AudioLibError) if there was an error raised by the underlying audio library.
     fn play(&mut self, track: &Track) -> Result<(), Error>;
 
+    fn still_playing(&self) -> bool;
+
     /// Stops the playback.
     ///
     /// Results in an [`AudioLibError`](crate::Error::AudioLibError) if there was an error raised by the underlying audio library.
@@ -44,6 +46,10 @@ impl<T: AudioLib> MediaPlayer for MediaPlayerImplementation<T> {
             self.last_track = Some(track.clone());
         }
         Ok(())
+    }
+
+    fn still_playing(&self) -> bool {
+        self.audio_lib.is_playing()
     }
 
     fn stop(&mut self) -> Result<(), Error> {

@@ -18,3 +18,7 @@ rfid_media_player --product_id <PRODUCT_ID> --tracks <TRACKS_FILE> --vendor_id <
 ```shell
 rfid_media_player --help
 ```
+
+## Issues
+
+* Running the application as privileged user (e.g. using `sudo`) does stop the playback before the track is finished

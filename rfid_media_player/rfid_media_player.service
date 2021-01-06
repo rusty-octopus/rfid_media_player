@@ -1,0 +1,17 @@
+#
+# Service file for starting & using the rfid_media_player with systemd
+#
+
+[Unit]
+Description=rfid_media_player application
+
+[Service]
+Type=simple
+# Set your user
+#User=paw
+# change the path to your device (use lsusb to identify bus and device value)
+#ExecStartPre=/usr/bin/chmod a+w /dev/bus/usb/002/009
+# Change to the path rfid_media_player is installed
+ExecStart=-/home/paw/01-ED/09-Programming/10-rust/08-media-player-card-reader/target/release/rfid_media_player -v 16c0 -p 27db -t tracks.yaml -c -l debug
+# Working directory
+WorkingDirectory=/home/paw/01-ED/09-Programming/10-rust/08-media-player-card-reader/rfid_media_player
