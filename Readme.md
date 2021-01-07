@@ -31,6 +31,8 @@
 * [RaspPI OS tutorial](https://github.com/rust-embedded/rust-raspberrypi-OS-tutorials)
 * [USB keyboard codes](https://www.win.tue.nl/~aeb/linux/kbd/scancodes-14.html)
 * [cross](https://crates.io/crates/cross)
+* [Cross compiling rust apps raspberry pi](https://capnfabs.net/posts/cross-compiling-rust-apps-raspberry-pi/)
+* [Adventures in Rust and Cross compilation for RP](https://www.growse.com/2020/04/26/adventures-in-rust-and-cross-compilation-for-the-raspberry-pi.html)
 
 ## Architecture
 
