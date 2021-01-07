@@ -22,3 +22,33 @@ rfid_media_player --help
 ## Issues
 
 * Running the application as privileged user (e.g. using `sudo`) does stop the playback before the track is finished
+
+## Enable access to USB device without root privilege
+
+* Use [`50-usb-rfid-reader.rules`](50-usb-rfid-reader.rules) file and modify `ATTRS{idVendor}` and `ATTRS{idProduct}` accordingly
+* Copy modified file to `/etc/udev/rules.d/` (may need root privilege)
+* Unplug & plug USB RFID reader or execute `udevadm control --reload-rules` (may need root privilege)
+* See [Ask Ubuntu - How do I make libusb work as non root](https://askubuntu.com/questions/978552/how-do-i-make-libusb-work-as-non-root)
+
+## Systemd user service usage
+
+* Prerequisites: USB RFID reader device must be accessible from your user, see [Enable access to USB device without root privilege](#enable-access-to-usb-device-without-root-privilege)
+* Modify [`rfid_media_player.service`](rfid_media_player.service) file
+* Copy the modified file to `~/.config/systemd/user`
+* Start the service with `systemctl --user start rfid_media_player.service`
+* Start the service with `systemctl --user stop rfid_media_player.service`
+* Enable the service on start-up with `systemctl --user enable rfid_media_player.service`
+* See [ArchLinux Wiki - Systemd/User](https://wiki.archlinux.org/index.php/Systemd/User)
+
+## Release notes
+
+* 1.0.0
+  * First release version
+
+## Code coverage
+
+* See tarpaulin [HTML report](../tarpaulin-report.html)
+
+## License
+
+[MIT license](LICENSE).
