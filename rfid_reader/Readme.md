@@ -101,3 +101,38 @@ rusb_mod -down-> rusbhumbleusbdevice
 rusbhumbleusbdevice -> utils
 rusbhumbleusbdevice -up.|> humbleusbdevice
 ```
+
+## Cross compilation
+
+### aarch64-unknown-linux-musl
+
+* Install target with `rustup`
+
+```shell
+rustup target add aarch64-unknown-linux-musl
+```
+
+* Install the GNU Compiler Collection - cross compiler for ARM64 target (below on ArchLinux)
+
+```shell
+sudo pacman -S aarch64-linux-gnu-gcc
+```
+
+* Install `musl-gcc`, in ArchLinux, this is contained in the `musl` package
+
+```shell
+sudo pacman -S musl
+```
+
+* Install musl kernel headers, in ArchLinux
+
+```shell
+sudo pacman -S kernel-headers-musl
+```
+
+* Build with setting environment `REALGCC` and `TARGET_CC`
+  * See [Adventures in Rust and Cross Compilation for the Raspberry Pi](https://www.growse.com/2020/04/26/adventures-in-rust-and-cross-compilation-for-the-raspberry-pi.html)
+
+```shell
+REALGCC=aarch64-linux-gnu-gcc TARGET_CC=musl-gcc cargo build --target=aarch64-unknown-linux-musl
+```

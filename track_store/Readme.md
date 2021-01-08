@@ -50,3 +50,33 @@ assert!(track_path.is_none());
 ## License
 
 [MIT license](LICENSE).
+
+## Cross compilation
+
+### armv7-unknown-linux-musleabihf
+
+* Install target with `rustup`
+
+```shell
+rustup target add armv7-unknown-linux-musleabihf
+```
+
+* Build with target
+
+```shell
+cargo build --target=armv7-unknown-linux-musleabihf
+```
+
+### aarch64-unknown-linux-musl
+
+* Install target with `rustup`
+
+```shell
+rustup target add aarch64-unknown-linux-musl
+```
+
+* Build with target
+
+```shell
+cargo build --target=aarch64-unknown-linux-musl
+```
