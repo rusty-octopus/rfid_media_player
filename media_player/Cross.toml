@@ -1,0 +1,6 @@
+
+[target.aarch64-unknown-linux-musl]
+image = "rfid_media_player/media_player:aarch64-unknown-linux-musl-1.0.0"
+volumes = [
+    "WS_DIR",
+]

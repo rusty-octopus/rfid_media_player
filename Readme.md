@@ -35,6 +35,7 @@
 * [Cross compiling rust apps raspberry pi](https://capnfabs.net/posts/cross-compiling-rust-apps-raspberry-pi/)
 * [Adventures in Rust and Cross compilation for RP](https://www.growse.com/2020/04/26/adventures-in-rust-and-cross-compilation-for-the-raspberry-pi.html)
 * [Cross compiling Rust binaries to ARMv7](https://www.modio.se/cross-compiling-rust-binaries-to-armv7.html)
+* [rust-cross](https://github.com/japaric/rust-cross)
 
 ## Architecture
 

@@ -51,3 +51,22 @@ media_player.stop().unwrap();
 ## License
 
 [MIT license](LICENSE).
+
+## cross compilation
+
+### Issues
+
+* Does not work since pkg-confog has not been configured to support cross-compilation
+
+### Using cross
+
+#### binfmt_misc
+
+* Follow instructions [here](https://www.kernel.org/doc/html/latest/admin-guide/binfmt-misc.html)
+
+### State
+
+* Best manual: [https://capnfabs.net/posts/cross-compiling-rust-apps-raspberry-pi/]
+* alsa.pc im Docker container: /usr/lib/aarch64-linux-gnu/pkgconfig/alsa.pc
+* Compiles but does not run test due to link error (I guess due to the fact that alsa-sys is dynamically linked)
+* Maybe usage of gnu instead of musl will help
