@@ -52,3 +52,13 @@ rfid_media_player --help
 ## License
 
 [MIT license](LICENSE).
+
+## Cross compilation
+
+### Using cross
+
+* Does not work, since workspace dependencies cannot be found (and I don't know how to add these in cross)
+
+### aarch64-unknown-linux-musl
+
+* Does not work, since [alsa-sys](https://github.com/diwic/alsa-sys/) links dynamically to alsa (dependency of [alsa](crates.io/crates/alsa) which is a dependency of [rodio](crates.io/crates/rodio)) which is a dependency of [media_player](../media_player)

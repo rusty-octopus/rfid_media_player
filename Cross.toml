@@ -1,6 +1,3 @@
 
 [target.aarch64-unknown-linux-gnu]
-image = "rfid_media_player/media_player:aarch64-unknown-linux-gnu-1.0.0"
-volumes = [
-    "WS_DIR",
-]
+image = "rfid_media_player:aarch64-unknown-linux-gnu-1.0.0"

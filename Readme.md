@@ -2,6 +2,14 @@
 
 * Cargo workspace of rfid_media_player application
 
+## Todos
+
+1. Consider implementing read result as RfidValue NewType
+2. License analysis dependencies: Either MIT or Apache 2.0 from all direct deps
+3. File issues
+    * Cpal and maybe rodio regarding to fast playback
+    * Improvement: build and link alsa lib for alsa-sys
+
 ## Relevant Crates
 
 * [rfid_media_player](./rfid_media_player/Readme.md): The application that plays a track when a RFID value is read
@@ -14,13 +22,32 @@
 * [usb_reader_test](usb_reader_test/Readme.md): Simple application build in order to learn how to access the USB device
 * [media_player_test](media_player_test/Readme.md): Simple application build in order to learn how to use audio library
 
-## Todos
+## Cross compilation
 
-1. Consider implementing read result as RfidValue NewType
-2. Debug running as root problem
-3. Cross Compile + documentation in crates + here
-4. Documentation here
-5. License analysis dependencies: Either MIT or Apache 2.0 from all direct deps
+### Prerequisites
+
+* Install [cross](crates.io/crates/cross)
+  * Follow also instruction regarding [binfmt_misc](https://github.com/rust-embedded/cross#dependencies)
+* Install and configure Docker, see [ArchLinux - Wiki - Docker](https://wiki.archlinux.org/index.php/Docker) for how to install and configure in ArchLinux
+  * Adding your user to the docker group is necessary
+
+### Build docker image
+
+* Execute build script
+
+```shell
+sh build_docker_image.sh
+```
+
+* If you want to use an own image name and tag, then modify the script or use command line but you have to modify [Cross.toml](./Cross.toml) as well
+
+### Cross compile
+
+* Build (release) with:
+
+```shell
+cross build --release --target=aarch64-unknown-linux-gnu
+```
 
 ## Useful Links
 

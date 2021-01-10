@@ -136,3 +136,7 @@ sudo pacman -S kernel-headers-musl
 ```shell
 REALGCC=aarch64-linux-gnu-gcc TARGET_CC=musl-gcc cargo build --target=aarch64-unknown-linux-musl
 ```
+
+### aarch64-unknown-linux-gnu
+
+* Works with [cross](crates.io/crates/cross) (no own Dockerfile needed)

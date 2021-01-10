@@ -54,9 +54,19 @@ media_player.stop().unwrap();
 
 ## cross compilation
 
+### aarch64-unknown-linux-musl
+
+* Does not work, since [alsa-sys](https://github.com/diwic/alsa-sys/) links dynamically to alsa (dependency of [alsa](crates.io/crates/alsa) which is a dependency of [rodio](crates.io/crates/rodio))
+* Does compile by using [cross](crates.io/crates/cross) and modified Docker container (see [musl Dockerfile](./Dockerfile.aarch64-unknown-linux-musl)) but linking fails when running tests
+
+### aarch64-unknown-linux-gnu
+
+* Works with [cross](crates.io/crates/cross) and [GNU Docker file](./Dockerfile)
+* See more detailed manual in workspace [Readme](../Readme.md)
+
 ### Issues
 
-* Does not work since pkg-confog has not been configured to support cross-compilation
+* Does not work since pkg-config has not been configured to support cross-compilation
 
 ### Using cross
 
@@ -64,9 +74,3 @@ media_player.stop().unwrap();
 
 * Follow instructions [here](https://www.kernel.org/doc/html/latest/admin-guide/binfmt-misc.html)
 
-### State
-
-* Best manual: [https://capnfabs.net/posts/cross-compiling-rust-apps-raspberry-pi/]
-* alsa.pc im Docker container: /usr/lib/aarch64-linux-gnu/pkgconfig/alsa.pc
-* Compiles but does not run test due to link error (I guess due to the fact that alsa-sys is dynamically linked)
-* Maybe usage of gnu instead of musl will help

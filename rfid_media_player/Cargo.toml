@@ -1,6 +1,6 @@
 [package]
 name = "rfid_media_player"
-version = "0.1.0"
+version = "1.0.0"
 authors = ["rusty-octopus <rustyoctopus@posteo.org>"]
 edition = "2018"
 license = "MIT"

@@ -80,3 +80,7 @@ rustup target add aarch64-unknown-linux-musl
 ```shell
 cargo build --target=aarch64-unknown-linux-musl
 ```
+
+### aarch64-unknown-linux-gnu
+
+* Works with [cross](crates.io/crates/cross) (no own Dockerfile needed)
