@@ -50,7 +50,7 @@ if result.is_err() {
 
 ## Code coverage
 
-* See tarpaulin [HTML report](../tarpaulin-report.html)
+* See [tarpaulin-report](../tarpaulin-report)
 
 ## License
 

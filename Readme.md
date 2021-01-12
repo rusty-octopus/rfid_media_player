@@ -9,6 +9,7 @@
 3. File issues
     * Cpal and maybe rodio regarding to fast playback
     * Improvement: build and link alsa lib for alsa-sys
+4. Add desgins as SVG images
 
 ## Relevant Crates
 

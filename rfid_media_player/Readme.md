@@ -47,7 +47,7 @@ rfid_media_player --help
 
 ## Code coverage
 
-* See tarpaulin [HTML report](../tarpaulin-report.html)
+* See [tarpaulin-report](../tarpaulin-report)
 
 ## License
 

@@ -1,0 +1,35 @@
+[INFO tarpaulin] Coverage Results:
+|| Uncovered Lines:
+|| media_player/src/rodiolib/mod.rs: 33
+|| rfid_media_player/src/lib.rs: 53-58, 60-61, 65
+|| rfid_media_player/src/rfidmediaplayer.rs: 68, 83
+|| rfid_reader/src/neuftech/usbreader.rs: 105, 108
+|| rfid_reader/src/rfidreader.rs: 47-48
+|| ../../../../../../usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/include/emmintrin.h: 826, 970
+|| ../../../../../../usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/include/xmmintrin.h: 186, 192, 198, 228, 234, 809-810, 894, 934, 983-984
+|| Tested/Total Lines:
+|| media_player/src/error.rs: 4/4 +0%
+|| media_player/src/lib.rs: 3/3 +0%
+|| media_player/src/mediaplayer.rs: 20/20 +0%
+|| media_player/src/rodiolib/mod.rs: 34/35 +0%
+|| media_player/src/track.rs: 10/10 +0%
+|| rfid_media_player/src/cli_app.rs: 24/24 +0%
+|| rfid_media_player/src/error.rs: 4/4 +0%
+|| rfid_media_player/src/lib.rs: 14/23 +0%
+|| rfid_media_player/src/rfidmediaplayer.rs: 50/52 +0%
+|| rfid_reader/src/error.rs: 2/2 +0%
+|| rfid_reader/src/humbleusbdevice.rs: 14/14 +0%
+|| rfid_reader/src/id.rs: 5/5 +0%
+|| rfid_reader/src/keymap.rs: 4/4 +0%
+|| rfid_reader/src/neuftech/keymap.rs: 8/8 +0%
+|| rfid_reader/src/neuftech/usbreader.rs: 45/47 +0%
+|| rfid_reader/src/rfidreader.rs: 17/19 +0%
+|| rfid_reader/src/rusb/utils.rs: 38/38 +0%
+|| track_store/src/error.rs: 2/2 +0%
+|| track_store/src/id.rs: 6/6 +0%
+|| track_store/src/trackpath.rs: 8/8 +0%
+|| track_store/src/trackstore.rs: 7/7 +0%
+|| ../../../../../../usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/include/emmintrin.h: 0/2 +0%
+|| ../../../../../../usr/lib/gcc/x86_64-pc-linux-gnu/10.2.0/include/xmmintrin.h: 0/11 +0%
+|| 
+91.67% coverage, 319/348 lines covered, +0% change in coverage

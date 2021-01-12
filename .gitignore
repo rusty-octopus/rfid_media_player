@@ -3,3 +3,4 @@ target/
 *.gnumeric
 media_player_test/sound.flac
 media_player_test/sound2.wav
+tarpaulin-report.html
