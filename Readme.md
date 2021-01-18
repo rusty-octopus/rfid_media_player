@@ -5,11 +5,13 @@
 ## Todos
 
 1. Consider implementing read result as RfidValue NewType
-2. License analysis dependencies: Either MIT or Apache 2.0 from all direct deps
-3. File issues
+2. Consider [coercion arguments idiom](https://rust-unofficial.github.io/patterns/idioms/coercion-arguments.html)
+3. Consider [constructor idiom](https://rust-unofficial.github.io/patterns/idioms/ctor.html)
+4. License analysis dependencies: Either MIT or Apache 2.0 from all direct deps
+5. File issues
     * Cpal and maybe rodio regarding to fast playback
     * Improvement: build and link alsa lib for alsa-sys
-4. Add designs as SVG images
+6. Add designs as SVG images
 
 ## Relevant Crates
 
@@ -158,3 +160,19 @@ end
 media_player --> rfid_media_player
 rfid_media_player -> rfid_reader: re-activate & wait
 ```
+
+## Raspberry PI OS installation for Raspberry PI 4 B
+
+* Download latest arm64 lite image (unless you want a GUI)
+  * [arm64 images](https://downloads.raspberrypi.org/raspios_lite_arm64/images/)
+* Install on SD card
+  * [Installing Images](https://www.raspberrypi.org/documentation/installation/installing-images/README.md)
+* Configure with [raspi-config](https://www.raspberrypi.org/documentation/configuration/raspi-config.md)
+  * E.g. Connect to internet
+* Update & Upgrade
+  * `sudo apt-get update`
+  * `sudo apt-get upgrade`
+* Reboot
+* Install pulseaudio
+  * `sudo apt-get install pulseaudio`
+* Reboot

@@ -26,6 +26,7 @@ rfid_media_player --help
 ## Enable access to USB device without root privilege
 
 * Use [`50-usb-rfid-reader.rules`](50-usb-rfid-reader.rules) file and modify `ATTRS{idVendor}` and `ATTRS{idProduct}` accordingly
+  * Alternatively use [`51-usb-rfid-reader.rules`](51-usb-rfid-reader.rules) (this one enables access for all users, so this is sub-optimal)
 * Copy modified file to `/etc/udev/rules.d/` (may need root privilege)
 * Unplug & plug USB RFID reader or execute `udevadm control --reload-rules` (may need root privilege)
 * See [Ask Ubuntu - How do I make libusb work as non root](https://askubuntu.com/questions/978552/how-do-i-make-libusb-work-as-non-root)
