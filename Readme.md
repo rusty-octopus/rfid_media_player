@@ -12,6 +12,7 @@
     * Cpal and maybe rodio regarding to fast playback
     * Improvement: build and link alsa lib for alsa-sys
 6. Add designs as SVG images
+    * Or use [aquamarine](https://crates.io/crates/aquamarine)
 
 ## Relevant Crates
 
